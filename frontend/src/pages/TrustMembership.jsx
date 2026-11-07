@@ -383,7 +383,7 @@ function RegisterModal({ onClose, initialTier }) {
         {step === 3 && (
           <div>
             <div className="tm-notice info">
-              🔒 Payment gateway powered by SabPaisa PG 3.0. Complete your initial monthly subscription to activate membership.
+              🔒 Official Trust Contribution Portal. Complete your initial monthly subscription to activate membership.
             </div>
 
             <div style={{ background: '#F8FAFC', border: '1px solid var(--tm-border)', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem' }}>

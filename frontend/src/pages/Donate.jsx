@@ -1016,8 +1016,8 @@ export default function Donate() {
                                     </div>
                                     </div>
                                     <div style={{ marginTop: "14px", background: "#eff6ff", padding: "14px", borderRadius: "8px", border: "1px solid #bfdbfe" }}>
-                                        <div style={{ fontSize: "13px", fontWeight: "700", color: "#1e40af", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}><FaShieldAlt style={{ color: "#2563eb" }} /> Instant UPI & Card Donations:</div>
-                                        <div style={{ fontSize: "12px", color: "#1e3a8a", lineHeight: 1.6 }}>To donate via <strong>PhonePe, Google Pay, Paytm, UPI QR, or Cards</strong> with an instant 80G tax receipt, fill the form on the right and click <strong>&quot;Proceed to Secure Payment&quot;</strong>.</div>
+                                        <div style={{ fontSize: "13px", fontWeight: "700", color: "#1e40af", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}><FaShieldAlt style={{ color: "#2563eb" }} /> Instant Online Contributions:</div>
+                                        <div style={{ fontSize: "12px", color: "#1e3a8a", lineHeight: 1.6 }}>To contribute via <strong>PhonePe, Google Pay, Paytm, UPI QR, or Cards</strong> with an instant Form 10BE 80G tax receipt, fill the form on the right and click <strong>&quot;Contribute Online&quot;</strong>.</div>
                                     </div>
                                     <div style={{ marginTop: '14px', borderTop: '1px dashed #cbd5e1', paddingTop: '10px' }}>
                                         <div style={{ fontSize: '12px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>Official Trust Documents</div>

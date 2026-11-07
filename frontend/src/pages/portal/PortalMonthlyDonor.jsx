@@ -68,7 +68,7 @@ export default function PortalMonthlyDonor() {
   const amountParam = searchParams.get('amount');
   const reasonParam = searchParams.get('reason');
 
-  const [selectedPlan, setSelectedPlan] = useState(MONTHLY_PLANS[0]); // Default ₹2 Test Plan
+  const [selectedPlan, setSelectedPlan] = useState(MONTHLY_PLANS[0]); // Default ₹500 Pillar
   const [customAmount, setCustomAmount] = useState('');
   const [isCustom, setIsCustom] = useState(false);
   const [autopayMethod, setAutopayMethod] = useState('UPI_AUTOPAY');
@@ -381,7 +381,7 @@ export default function PortalMonthlyDonor() {
                 ℹ️ AutoPay Mandate Requirement:
               </strong>
               <p style={{ fontSize: '0.85rem', color: '#1E3A8A', margin: 0, lineHeight: 1.5 }}>
-                Monthly recurring subscriptions strictly require automated mandate authentication through SabPaisa (UPI AutoPay, NetBanking eNACH, or Card). Direct manual bank transfers do not support automated recurring deductions. Please retry below to activate your AutoPay mandate.
+                Monthly recurring subscriptions strictly require automated mandate authentication (UPI AutoPay, NetBanking eNACH, or Card). Direct manual bank transfers do not support automated recurring deductions. Please retry below to activate your AutoPay mandate.
               </p>
             </div>
 
