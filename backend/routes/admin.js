@@ -8,7 +8,7 @@ const MonthlySchedule = require('../models/MonthlySchedule');
 const Donation = require('../models/Donation');
 const PerformanceMetric = require('../models/PerformanceMetric');
 const { memoryStore, getSupabaseSchemaSQL } = require('../services/supabaseService');
-const { sendMonthlyReminderEmail, sendOtpEmail } = require('../services/emailService');
+const { sendMonthlyReminderEmail, sendOtpEmail, sendPaymentSuccessEmail, sendPaymentPendingEmail, sendPaymentFailureEmail } = require('../services/emailService');
 const { autoRankDonors, getCachedLeaderboard } = require('../services/rankingService');
 const { requireAdmin } = require('../middleware/authMiddleware');
 
@@ -362,6 +362,260 @@ router.post('/batch-reminders', async (req, res) => {
         });
     } catch (err) {
         return res.status(500).json({ success: false, message: 'Failed to run batch reminders' });
+    }
+});
+
+// POST /api/admin/payments/:id/resend-receipt — Re-dispatches official Form 10BE 80G Tax Exemption Receipt
+router.post('/payments/:id/resend-receipt', async (req, res) => {
+    try {
+        const { id } = req.params;
+        let donation = null;
+        if (mongoose.connection.readyState >= 1) {
+            donation = await Donation.findOne({
+                $or: [
+                    mongoose.Types.ObjectId.isValid(id) ? { _id: id } : null,
+                    { transactionId: id },
+                    { sabpaisaTxnId: id },
+                    { receiptNumber: id }
+                ].filter(Boolean)
+            });
+        }
+        if (!donation) {
+            donation = memoryStore.payments.find(p => p._id === id || p.transactionId === id || p.receiptNumber === id);
+        }
+        if (!donation) {
+            return res.status(404).json({ success: false, message: 'Transaction record not found' });
+        }
+        if (!donation.email) {
+            return res.status(400).json({ success: false, message: 'No donor email attached to this transaction.' });
+        }
+
+        const emailResult = await sendPaymentSuccessEmail({
+            name: donation.fullName || 'Valued Donor',
+            email: donation.email,
+            mobile: donation.mobile,
+            address: donation.address,
+            amount: donation.amount,
+            receiptNumber: donation.receiptNumber || `KCT-${Date.now()}`,
+            transactionId: donation.sabpaisaTxnId || donation.transactionId,
+            clientTxnId: donation.transactionId,
+            purpose: donation.purpose || 'General Philanthropy',
+            donorCategory: donation.donorCategory || 'general_donation',
+            date: donation.createdAt || new Date()
+        });
+
+        return res.json({
+            success: true,
+            message: `Official Form 10BE 80G Tax Exemption Receipt re-dispatched to ${donation.email}`,
+            emailResult
+        });
+    } catch (err) {
+        console.error('Receipt resend error:', err);
+        return res.status(500).json({ success: false, message: 'Failed to dispatch receipt: ' + err.message });
+    }
+});
+
+// PUT /api/admin/payments/:id/status — Update payment status manually
+router.put('/payments/:id/status', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status, notes } = req.body;
+        if (!status) {
+            return res.status(400).json({ success: false, message: 'Status is required' });
+        }
+
+        let donation = null;
+        if (mongoose.connection.readyState >= 1) {
+            donation = await Donation.findOne({
+                $or: [
+                    mongoose.Types.ObjectId.isValid(id) ? { _id: id } : null,
+                    { transactionId: id },
+                    { receiptNumber: id }
+                ].filter(Boolean)
+            });
+            if (donation) {
+                donation.status = status;
+                if (notes) donation.adminNotes = notes;
+                if (status === 'success' && !donation.receiptNumber) {
+                    donation.receiptNumber = `KCT-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+                }
+                await donation.save();
+            }
+        }
+
+        if (!donation) {
+            const memP = memoryStore.payments.find(p => p._id === id || p.transactionId === id);
+            if (memP) {
+                memP.status = status;
+                donation = memP;
+            }
+        }
+
+        if (!donation) {
+            return res.status(404).json({ success: false, message: 'Transaction record not found' });
+        }
+
+        // If changed to success, send 80G certificate
+        if (status === 'success' && donation.email) {
+            sendPaymentSuccessEmail({
+                name: donation.fullName || 'Valued Donor',
+                email: donation.email,
+                mobile: donation.mobile,
+                address: donation.address,
+                amount: donation.amount,
+                receiptNumber: donation.receiptNumber || `KCT-${Date.now()}`,
+                transactionId: donation.sabpaisaTxnId || donation.transactionId,
+                clientTxnId: donation.transactionId,
+                purpose: donation.purpose,
+                donorCategory: donation.donorCategory
+            }).catch(e => console.warn('Receipt dispatch notice:', e.message));
+        }
+
+        return res.json({
+            success: true,
+            message: `Transaction status updated to ${status.toUpperCase()}`,
+            donation
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: 'Failed to update transaction status' });
+    }
+});
+
+// GET /api/admin/payments/export-csv — Streams clean CSV of all transactions
+router.get('/payments/export-csv', async (req, res) => {
+    try {
+        let payments = [];
+        if (mongoose.connection.readyState >= 1) {
+            payments = await Donation.find().sort({ createdAt: -1 }).limit(1000).lean();
+        } else {
+            payments = memoryStore.payments;
+        }
+
+        const headers = ['Receipt No', 'Transaction ID', 'Donor Name', 'Email', 'Mobile', 'Amount (INR)', 'Purpose', 'Status', 'Date'];
+        const rows = payments.map(p => [
+            p.receiptNumber || 'N/A',
+            p.transactionId || p.sabpaisaTxnId || 'N/A',
+            `"${(p.fullName || '').replace(/"/g, '""')}"`,
+            p.email || 'N/A',
+            p.mobile || 'N/A',
+            p.amount || 0,
+            `"${(p.purpose || 'General Donation').replace(/"/g, '""')}"`,
+            p.status || 'pending',
+            p.createdAt ? new Date(p.createdAt).toISOString() : ''
+        ]);
+
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="kct-donations-${Date.now()}.csv"`);
+        return res.status(200).send(csvContent);
+    } catch (err) {
+        return res.status(500).json({ success: false, message: 'CSV export failed' });
+    }
+});
+
+// GET /api/admin/users — List and filter users
+router.get('/users', async (req, res) => {
+    try {
+        const { search, role, limit = 50, page = 1 } = req.query;
+        let users = [];
+        let total = 0;
+
+        if (mongoose.connection.readyState >= 1) {
+            const query = {};
+            if (role) query.role = role;
+            if (search) {
+                query.$or = [
+                    { name: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { phone: { $regex: search, $options: 'i' } }
+                ];
+            }
+            const skip = (Number(page) - 1) * Number(limit);
+            users = await User.find(query, '-password').sort({ createdAt: -1 }).skip(skip).limit(Number(limit)).lean();
+            total = await User.countDocuments(query);
+        } else {
+            users = (memoryStore.users || []).map(({ password, ...u }) => u);
+            total = users.length;
+        }
+
+        return res.json({
+            success: true,
+            total,
+            page: Number(page),
+            users
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: 'Failed to fetch users' });
+    }
+});
+
+// PUT /api/admin/users/:id/role — Change User Role
+router.put('/users/:id/role', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { role } = req.body;
+        if (!['admin', 'trust_member', 'volunteer', 'donor'].includes(role)) {
+            return res.status(400).json({ success: false, message: 'Invalid role specified.' });
+        }
+
+        if (mongoose.connection.readyState >= 1) {
+            const user = await User.findByIdAndUpdate(id, { role }, { new: true }).select('-password');
+            if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+            return res.json({ success: true, message: `User role updated to ${role}`, user });
+        } else {
+            const u = (memoryStore.users || []).find(x => x._id === id || x.id === id);
+            if (u) {
+                u.role = role;
+                return res.json({ success: true, message: `User role updated to ${role}`, user: u });
+            }
+        }
+        return res.status(404).json({ success: false, message: 'User not found' });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: 'Failed to update user role' });
+    }
+});
+
+// PUT /api/admin/users/:id/reset-password — Reset user password
+router.put('/users/:id/reset-password', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { newPassword } = req.body;
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 6 characters long.' });
+        }
+
+        const bcrypt = require('bcryptjs');
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        if (mongoose.connection.readyState >= 1) {
+            const user = await User.findByIdAndUpdate(id, { password: hashedPassword }, { new: true }).select('-password');
+            if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+            return res.json({ success: true, message: `Password for ${user.email} reset successfully.` });
+        } else {
+            const u = (memoryStore.users || []).find(x => x._id === id || x.id === id);
+            if (u) {
+                u.password = hashedPassword;
+                return res.json({ success: true, message: `Password for ${u.email} reset successfully.` });
+            }
+        }
+        return res.status(404).json({ success: false, message: 'User not found' });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: 'Failed to reset password' });
+    }
+});
+
+// DELETE /api/admin/users/:id — Delete user
+router.delete('/users/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        if (mongoose.connection.readyState >= 1) {
+            await User.findByIdAndDelete(id);
+        } else {
+            memoryStore.users = (memoryStore.users || []).filter(u => u._id !== id && u.id !== id);
+        }
+        return res.json({ success: true, message: 'User record deleted.' });
+    } catch (err) {
+        return res.status(500).json({ success: false, message: 'Failed to delete user' });
     }
 });
 

@@ -16,3 +16,5 @@ export function numberToWords(amount) {
     if (num === 0) return 'Zero Rupees Only';
     return 'Rupees ' + convert(num).trim() + ' Only';
 }
+
+export const numberToWordsIndian = numberToWords;
