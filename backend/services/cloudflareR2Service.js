@@ -19,7 +19,7 @@ const R2_ACCOUNT_ID = process.env.CLOUDFLARE_R2_ACCOUNT_ID || '';
 const R2_ACCESS_KEY_ID = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || '';
 const R2_SECRET_ACCESS_KEY = process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || '';
 const R2_BUCKET_NAME = process.env.CLOUDFLARE_R2_BUCKET_NAME || 'trustholdersimages';
-const R2_PUBLIC_DOMAIN = process.env.CLOUDFLARE_R2_PUBLIC_DOMAIN || ''; // e.g. https://media.kirancharitabletrust.org or https://pub-xxxx.r2.dev
+const R2_PUBLIC_DOMAIN = process.env.CLOUDFLARE_R2_PUBLIC_DOMAIN || 'https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev';
 
 let s3Client = null;
 
