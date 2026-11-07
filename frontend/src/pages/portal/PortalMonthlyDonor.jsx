@@ -8,14 +8,6 @@ import { numberToWords } from '../../utils/numberToWords';
 
 const MONTHLY_PLANS = [
   {
-    id: 'm2',
-    amount: 2,
-    title: '⚡ Test AutoPay Mandate',
-    desc: 'Live testing plan (₹2) to verify UPI AutoPay and bank recurring mandate authentication.',
-    icon: '⚡',
-    isTest: true
-  },
-  {
     id: 'm500',
     amount: 500,
     title: 'Child Nutrition Pillar',
@@ -121,8 +113,8 @@ export default function PortalMonthlyDonor() {
     if (!form.fullName || !form.email || !form.mobile || !form.address) {
       return setError('Please fill in your name, email, mobile number, and address.');
     }
-    if (effectiveAmount < 2) {
-      return setError('Minimum monthly contribution is ₹2.');
+    if (effectiveAmount < 100) {
+      return setError('Minimum monthly contribution is ₹100.');
     }
     if (!authorizedMandate) {
       return setError('Please accept the AutoPay mandate authorization terms to continue.');
@@ -168,7 +160,7 @@ export default function PortalMonthlyDonor() {
       }
     } catch (err) {
       console.error('AutoPay Setup Error:', err);
-      setError(err.response?.data?.message || 'Connection to SabPaisa gateway failed. Please try again.');
+      setError(err.response?.data?.message || 'Unable to connect to contribution portal. Please try again.');
       setLoading(false);
     }
   }
@@ -205,7 +197,7 @@ export default function PortalMonthlyDonor() {
             Official 80G <span>Donation Certificate</span>
           </h1>
           <p className="pt-page-sub">
-            Your contribution of ₹{Number(finalAmount).toLocaleString('en-IN')} has been received and verified via SabPaisa.
+            Your contribution of ₹{Number(finalAmount).toLocaleString('en-IN')} has been received and confirmed.
           </p>
         </section>
 
@@ -240,7 +232,7 @@ export default function PortalMonthlyDonor() {
             <div className="cert-meta-row">
               <div><label>Certificate / Receipt No:</label> <strong>{finalReceipt}</strong></div>
               <div><label>Date of Donation:</label> <strong>{finalDate}</strong></div>
-              <div><label>SabPaisa / Bank Ref:</label> <strong>{finalTxn}</strong></div>
+              <div><label>Bank / Transaction Ref:</label> <strong>{finalTxn}</strong></div>
               <div><label>Assessment Year:</label> <strong>2026 - 2027</strong></div>
             </div>
 
@@ -268,7 +260,7 @@ export default function PortalMonthlyDonor() {
                 </tr>
                 <tr>
                   <td className="cert-lbl">Mode of Remittance:</td>
-                  <td className="cert-val">SabPaisa PG 3.0 / UPI AutoPay</td>
+                  <td className="cert-val">Official Online Portal / UPI AutoPay</td>
                 </tr>
                 <tr className="cert-amt-row">
                   <td className="cert-lbl">Donation Amount Received:</td>
@@ -524,15 +516,15 @@ export default function PortalMonthlyDonor() {
                 <span style={{ fontSize: '1.4rem' }}>✨</span>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--pt-secondary)' }}>Custom Monthly Amount</div>
-                  <div style={{ fontSize: '0.76rem', color: 'var(--pt-text-light)' }}>Enter custom amount (Min ₹2 for testing)</div>
+                  <div style={{ fontSize: '0.76rem', color: 'var(--pt-text-light)' }}>Enter custom monthly contribution</div>
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <span style={{ fontWeight: 800, color: 'var(--pt-primary)', fontSize: '1.1rem' }}>₹</span>
                 <input
                   type="number"
-                  min="2"
-                  placeholder="e.g. 2"
+                  min="100"
+                  placeholder="e.g. 1000"
                   value={customAmount}
                   onChange={e => { setCustomAmount(e.target.value); setIsCustom(true); }}
                   onClick={e => e.stopPropagation()}
@@ -691,7 +683,7 @@ export default function PortalMonthlyDonor() {
                     style={{ width: 19, height: 19, marginTop: 2, accentColor: 'var(--pt-primary)' }}
                   />
                   <div style={{ fontSize: '0.86rem', color: '#334155', lineHeight: 1.5 }}>
-                    <strong>I authorize the monthly AutoPay Mandate of ₹{effectiveAmount.toLocaleString('en-IN')}:</strong> I consent to automated monthly recurring debit via SabPaisa on the 1st of every month for Kiran Charitable Trust rural welfare programs. I understand I can pause or revoke this mandate anytime without charge.
+                    <strong>I authorize the monthly AutoPay Mandate of ₹{effectiveAmount.toLocaleString('en-IN')}:</strong> I consent to automated monthly recurring contribution on the 1st of every month for Kiran Charitable Trust rural welfare programs. I understand I can pause or cancel anytime without charge.
                   </div>
                 </label>
               </div>
@@ -715,7 +707,7 @@ export default function PortalMonthlyDonor() {
                   cursor: !authorizedMandate ? 'not-allowed' : 'pointer'
                 }}
               >
-                {loading ? 'Initiating AutoPay Mandate on SabPaisa...' : `⚡ Set Up AutoPay Mandate (₹${effectiveAmount.toLocaleString('en-IN')}/mo) via SabPaisa`}
+                {loading ? 'Setting up monthly contribution...' : `⚡ Set Up Monthly Contribution (₹${effectiveAmount.toLocaleString('en-IN')}/mo)`}
               </button>
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem', color: 'var(--pt-text-light)', fontSize: '0.8rem' }}>
@@ -765,7 +757,7 @@ export default function PortalMonthlyDonor() {
                 📌 Note Regarding Direct Bank Transfer:
               </strong>
               <p style={{ fontSize: '0.8rem', color: '#1E3A8A', margin: 0, lineHeight: 1.5 }}>
-                Manual NEFT / RTGS transfers to our Canara Bank account cannot establish an automated recurring AutoPay debit. Please authorize the AutoPay mandate above through SabPaisa for monthly giving.
+                Manual NEFT / RTGS transfers to our Canara Bank account cannot establish an automated recurring AutoPay debit. Please authorize the monthly contribution above for recurring giving.
               </p>
             </div>
 

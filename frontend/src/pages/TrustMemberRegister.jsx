@@ -12,7 +12,6 @@ import {
 import './TrustMemberRegister.css';
 
 const TIERS = [
-    { id: 'test', name: 'Test Patron (₹2)', amount: 2, desc: 'Live ₹2 testing tier for verification' },
     { id: 'starter', name: 'Starter Patron', amount: 500, desc: 'Supports daily nutritious meals' },
     { id: 'silver', name: 'Silver Patron', amount: 1000, desc: 'Sponsors school kits & medicine' },
     { id: 'gold', name: 'Gold Patron', amount: 2500, desc: 'Provides comprehensive elder care' },
@@ -23,7 +22,7 @@ export default function TrustMemberRegister() {
     const { user, isAuthenticated, openAuthModal, refreshUser } = useAuth();
     const navigate = useNavigate();
 
-    const [selectedTier, setSelectedTier] = useState('test');
+    const [selectedTier, setSelectedTier] = useState('starter');
     const [customAmount, setCustomAmount] = useState('5000');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');

@@ -77,7 +77,7 @@ export default function PortalHome() {
               <h3 className="pt-card-title">Become a Member</h3>
               <p className="pt-card-desc">
                 Register as an official Trust Member with Aadhaar and optional PAN details.
-                Select your patron tier (from ₹500/mo) and activate with direct payment via SabPaisa.
+                Select your patron tier (from ₹500/mo) and activate with direct contribution online.
               </p>
             </div>
             <span className="pt-card-action">Register & Join Now →</span>
@@ -116,7 +116,7 @@ export default function PortalHome() {
               <h3 className="pt-card-title">Monthly Giving Society</h3>
               <p className="pt-card-desc">
                 Subscribe directly to monthly child nutrition, elder healthcare, or rural education pillars.
-                Direct checkout via SabPaisa PG 3.0 with no login required.
+                Direct online contribution with no login required.
               </p>
             </div>
             <span className="pt-card-action">Subscribe Monthly →</span>

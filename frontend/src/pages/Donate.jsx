@@ -38,7 +38,7 @@ function numberToWords(amount) {
     return num === 0 ? 'Zero Rupees Only' : 'Rupees ' + convert(num).trim() + ' Only';
 }
 
-const amounts = [2, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]
+const amounts = [500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]
 const purposes = [
     { value: 'general', label: 'General Donation' },
     { value: 'education', label: 'Education Support' },
@@ -177,7 +177,7 @@ export default function Donate() {
                 amount: finalAmount,
                 date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
                 purpose: finalPurpose,
-                paymentMethod: 'SabPaisa Online PG / UPI',
+                paymentMethod: 'Online Contribution / UPI',
             });
             setShowThankYou(true);
             setFailedPaymentData(null);
@@ -512,7 +512,7 @@ export default function Donate() {
                                 <div className="cert-meta-row">
                                     <div><label>Certificate / Receipt No:</label> <strong>{receiptData.receiptNo}</strong></div>
                                     <div><label>Date of Donation:</label> <strong>{receiptData.date}</strong></div>
-                                    <div><label>SabPaisa / Bank Ref:</label> <strong>{receiptData.txnId}</strong></div>
+                                    <div><label>Bank / Transaction Ref:</label> <strong>{receiptData.txnId}</strong></div>
                                     <div><label>Assessment Year:</label> <strong>2026 - 2027</strong></div>
                                 </div>
 
@@ -541,7 +541,7 @@ export default function Donate() {
                                         </tr>
                                         <tr>
                                             <td className="cert-lbl">Mode of Remittance:</td>
-                                            <td className="cert-val">{receiptData.paymentMethod || 'SabPaisa Online PG / UPI'}</td>
+                                            <td className="cert-val">{receiptData.paymentMethod || 'Online Contribution / UPI'}</td>
                                         </tr>
                                         <tr className="cert-amt-row">
                                             <td className="cert-lbl">Donation Amount Received:</td>
@@ -746,7 +746,7 @@ export default function Donate() {
                                     <div className="help-box-icon"><FaCreditCard /></div>
                                     <div>
                                         <strong>Notice for Card Payments:</strong>
-                                        <p>Indian payment gateway aggregators (Atom / SabPaisa) require a minimum transaction of <strong>₹10</strong> for Credit & Debit Cards due to interchange rules. For micro-donations of <strong>₹1 to ₹9</strong>, please choose <strong>UPI (GPay, PhonePe, Paytm, BHIM)</strong> which supports amounts starting at ₹1.</p>
+                                        <p>Card networks require a minimum transaction of <strong>₹10</strong> for Credit & Debit Cards due to interchange rules. For micro-donations of <strong>₹1 to ₹9</strong>, please choose <strong>UPI (GPay, PhonePe, Paytm, BHIM)</strong> which supports amounts starting at ₹1.</p>
                                     </div>
                                 </div>
 
@@ -766,7 +766,7 @@ export default function Donate() {
                                     <div style={{ marginTop: '16px', background: '#eff6ff', border: '1.5px solid #93c5fd', borderRadius: '10px', padding: '14px', textAlign: 'left' }}>
                                         <strong style={{ color: '#1e40af', display: 'block', marginBottom: '4px' }}>🔁 Dedicated Monthly Subscription Mandate:</strong>
                                         <p style={{ fontSize: '13px', color: '#1e3a8a', margin: 0, lineHeight: 1.5 }}>
-                                            Monthly recurring subscriptions are processed online through SabPaisa automated recurring mandates (UPI AutoPay / eNACH). Manual direct bank transfers do not support automated monthly recurring subscriptions.
+                                            Monthly recurring contributions are processed online through automated recurring mandates (UPI AutoPay / eNACH). Manual direct bank transfers do not support automated monthly recurring subscriptions.
                                         </p>
                                     </div>
                                 )}
@@ -779,7 +779,7 @@ export default function Donate() {
                                         className="btn btn-primary"
                                         style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                     >
-                                        <FaRedo /> Retry Monthly Subscription via SabPaisa
+                                        <FaRedo /> Retry Monthly Contribution
                                     </Link>
                                 ) : (
                                     <button
@@ -1210,7 +1210,7 @@ export default function Donate() {
                                                 {paymentChannel === 'online' && (
                                                     <>
                                                         <FaShieldAlt style={{ color: '#2563eb', flexShrink: 0 }} />
-                                                        <span>Official Trust Contribution Portal (SabPaisa): UPI Apps, QR, Cards &amp; NetBanking</span>
+                                                        <span>Official Trust Contribution Portal: UPI Apps, QR, Cards &amp; NetBanking</span>
                                                     </>
                                                 )}
                                                 {paymentChannel === 'qr_code' && (
@@ -1754,7 +1754,7 @@ export default function Donate() {
                                                     ? `Record UPI Donation & Get 80G Receipt (₹${Number(finalAmount).toLocaleString('en-IN')})`
                                                     : (paymentChannel === 'bank_transfer'
                                                         ? `Record Bank Transfer & Get 80G Receipt (₹${Number(finalAmount).toLocaleString('en-IN')})` 
-                                                        : `Contribute ₹${Number(finalAmount).toLocaleString('en-IN')} via SabPaisa`))
+                                                        : `Contribute ₹${Number(finalAmount).toLocaleString('en-IN')}`))
                                                 : `Submit Item Donation Support`}
                                         </>
                                     )}
@@ -1783,7 +1783,7 @@ export default function Donate() {
                         <div className="sabpaisa-modal-header">
                             <div className="sabpaisa-modal-title">
                                 <span className="sabpaisa-dot-live"></span>
-                                <span>SabPaisa Secure Checkout &bull; ₹{Number(checkoutSession.amount).toLocaleString('en-IN')}</span>
+                                <span>Official Secure Checkout &bull; ₹{Number(checkoutSession.amount).toLocaleString('en-IN')}</span>
                             </div>
                             <div className="sabpaisa-modal-actions">
                                 <a
@@ -1811,7 +1811,7 @@ export default function Donate() {
                         <div className="sabpaisa-iframe-wrapper">
                             <iframe
                                 src={checkoutSession.url}
-                                title="SabPaisa Secure Checkout"
+                                title="Official Secure Checkout"
                                 allow="payment"
                                 className="sabpaisa-checkout-iframe"
                             />

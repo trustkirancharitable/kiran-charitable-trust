@@ -5,7 +5,6 @@ import './Portal.css';
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const TIERS = [
-  { id: 'test',    icon: '⚡', label: 'Test Patron',    price: 2,    desc: 'Live ₹2 testing membership tier for instant verification' },
   { id: 'starter', icon: '🥉', label: 'Starter Patron', price: 500,  desc: 'Official digital ID card, certificate & monthly newsletter' },
   { id: 'silver',  icon: '🥈', label: 'Silver Patron',  price: 1000, desc: 'Silver privileges, quarterly impact reports & member directory listing' },
   { id: 'gold',    icon: '🥇', label: 'Gold Patron',    price: 2500, desc: 'All Silver perks + annual summit invitation', featured: true },
@@ -23,8 +22,8 @@ export default function PortalJoin() {
     address: '',
     aadharNumber: '',
     panNumber: '',
-    amount: 2,
-    tier: 'test',
+    amount: 500,
+    tier: 'starter',
     profilePhoto: null,
     photoPreview: null,
   });
@@ -448,7 +447,7 @@ export default function PortalJoin() {
                   Step 3: Review & Payment Confirmation
                 </h3>
                 <p style={{ color: 'var(--pt-text-gray)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-                  Verify your profile details and complete your first monthly contribution via SabPaisa PG 3.0.
+                  Verify your profile details and confirm your first monthly contribution online.
                 </p>
 
                 <div style={{ background: 'var(--pt-bg-light)', border: '1.5px solid var(--pt-border)', borderRadius: 12, padding: '1.4rem', marginBottom: '1.5rem' }}>
@@ -490,7 +489,7 @@ export default function PortalJoin() {
                   onClick={processMembershipPayment}
                   disabled={loading}
                 >
-                  {loading ? 'Processing via SabPaisa...' : `Pay ₹${Number(form.amount).toLocaleString('en-IN')} & Become Member`}
+                  {loading ? 'Processing contribution...' : `Contribute ₹${Number(form.amount).toLocaleString('en-IN')} & Join as Member`}
                 </button>
 
                 <button
@@ -600,7 +599,7 @@ export default function PortalJoin() {
             <div style={{ marginTop: '2rem', padding: '1rem', background: '#FFFFFF', borderRadius: 10, border: '1px solid var(--pt-border)' }}>
               <div style={{ fontWeight: 800, color: 'var(--pt-secondary)', fontSize: '0.88rem' }}>🔒 Secure Gateway</div>
               <div style={{ fontSize: '0.78rem', color: 'var(--pt-text-light)', marginTop: '4px' }}>
-                All payments processed through SabPaisa PG 3.0 with 256-bit SSL encryption.
+                All contributions processed with 256-bit SSL encryption.
               </div>
             </div>
           </div>
