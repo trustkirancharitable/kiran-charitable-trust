@@ -396,7 +396,7 @@ export default function Donate() {
                 }));
             } catch (e) {}
 
-            toast.info('Processing for payment gateway opening...', { autoClose: 1800 });
+            toast.info('Connecting to secure contribution portal...', { autoClose: 1800 });
             try {
                 const response = await axios.post(`${API_BASE_URL}/donations/initiate-sabpaisa`, {
                     fullName: data.fullName,
@@ -418,7 +418,7 @@ export default function Donate() {
                 }
             } catch (error) {
                 console.error('Payment initiation error:', error);
-                const errorMsg = error.response?.data?.message || 'Unable to connect to payment gateway. Please try again.';
+                const errorMsg = error.response?.data?.message || 'Unable to connect to contribution portal. Please try again.';
                 toast.error(errorMsg, { autoClose: 2500 });
                 setIsSubmitting(false);
                 return;
@@ -1173,7 +1173,7 @@ export default function Donate() {
                                         {/* Payment Way Dropdown */}
                                         <div className="form-group" style={{ marginTop: '16px', marginBottom: '16px' }}>
                                             <label htmlFor="pay-channel" style={{ fontWeight: '700', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                                                <FaUniversity style={{ color: 'var(--primary)' }} /> Select Payment Way *
+                                                <FaUniversity style={{ color: 'var(--primary)' }} /> Select Contribution Mode *
                                             </label>
                                             <select
                                                 id="pay-channel"
@@ -1202,7 +1202,7 @@ export default function Donate() {
                                                     boxShadow: '0 1px 4px rgba(37, 99, 235, 0.12)'
                                                 }}
                                             >
-                                                <option value="online">Online Payments (UPI, Cards, NetBanking)</option>
+                                                <option value="online">Online Contribution (UPI, Cards, NetBanking)</option>
                                                 <option value="qr_code">Direct UPI QR &amp; UPI ID</option>
                                                 <option value="bank_transfer">Direct Bank Transfer (NEFT / IMPS / RTGS)</option>
                                             </select>
@@ -1210,7 +1210,7 @@ export default function Donate() {
                                                 {paymentChannel === 'online' && (
                                                     <>
                                                         <FaShieldAlt style={{ color: '#2563eb', flexShrink: 0 }} />
-                                                        <span>Instant Online Gateway (SabPaisa): UPI Apps, QR, Cards &amp; NetBanking</span>
+                                                        <span>Official Trust Contribution Portal (SabPaisa): UPI Apps, QR, Cards &amp; NetBanking</span>
                                                     </>
                                                 )}
                                                 {paymentChannel === 'qr_code' && (
@@ -1745,7 +1745,7 @@ export default function Donate() {
                                     {isSubmitting ? (
                                         <>
                                             <span style={{ display: 'inline-block', width: 16, height: 16, border: '2px solid white', borderRightColor: 'transparent', borderRadius: '50%', animation: 'recaptchaRotation 0.6s linear infinite', marginRight: 8, verticalAlign: 'middle' }}></span>
-                                            Processing for payment gateway opening...
+                                            Connecting to secure contribution portal...
                                         </>
                                     ) : (
                                         <>
@@ -1754,7 +1754,7 @@ export default function Donate() {
                                                     ? `Record UPI Donation & Get 80G Receipt (₹${Number(finalAmount).toLocaleString('en-IN')})`
                                                     : (paymentChannel === 'bank_transfer'
                                                         ? `Record Bank Transfer & Get 80G Receipt (₹${Number(finalAmount).toLocaleString('en-IN')})` 
-                                                        : `Donate ₹${Number(finalAmount).toLocaleString('en-IN')} via SabPaisa Gateway`))
+                                                        : `Contribute ₹${Number(finalAmount).toLocaleString('en-IN')} via SabPaisa`))
                                                 : `Submit Item Donation Support`}
                                         </>
                                     )}

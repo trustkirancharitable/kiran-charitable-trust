@@ -1,4 +1,10 @@
-const { createClient } = require('@supabase/supabase-js');
+let createClient = null;
+try {
+    const sb = require('@supabase/supabase-js');
+    createClient = sb.createClient;
+} catch (e) {
+    // Graceful fallback if @supabase/supabase-js is not installed
+}
 
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
@@ -6,6 +12,7 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABA
 let supabaseClient = null;
 
 function getSupabase() {
+    if (!createClient) return null;
     if (!supabaseClient && SUPABASE_URL && SUPABASE_KEY) {
         try {
             supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {

@@ -1,4 +1,16 @@
-const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+let S3Client = null;
+let PutObjectCommand = null;
+let GetObjectCommand = null;
+
+try {
+    const s3 = require('@aws-sdk/client-s3');
+    S3Client = s3.S3Client;
+    PutObjectCommand = s3.PutObjectCommand;
+    GetObjectCommand = s3.GetObjectCommand;
+} catch (e) {
+    // Graceful fallback if @aws-sdk/client-s3 is not installed
+}
+
 const fs = require('fs');
 const path = require('path');
 
@@ -12,6 +24,7 @@ const R2_PUBLIC_DOMAIN = process.env.CLOUDFLARE_R2_PUBLIC_DOMAIN || ''; // e.g. 
 let s3Client = null;
 
 function getR2Client() {
+    if (!S3Client) return null;
     if (!s3Client && R2_ACCOUNT_ID && R2_ACCESS_KEY_ID && R2_SECRET_ACCESS_KEY) {
         s3Client = new S3Client({
             region: 'auto',

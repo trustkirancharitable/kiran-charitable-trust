@@ -7,8 +7,8 @@ try {
 }
 const dns = require('dns');
 
-// DNS server fallback setup for environment network compatibility
-if (dns && typeof dns.setServers === 'function') {
+// DNS server fallback setup for local development network compatibility (disabled on Vercel)
+if (!process.env.VERCEL && dns && typeof dns.setServers === 'function') {
     try {
         dns.setServers(['8.8.8.8', '8.8.4.4']);
     } catch (err) {
