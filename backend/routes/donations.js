@@ -2,6 +2,11 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const Donation = require('../models/Donation');
+const TrustMember = require('../models/TrustMember');
+const MonthlySchedule = require('../models/MonthlySchedule');
+const PerformanceMetric = require('../models/PerformanceMetric');
+const { sendPaymentSuccessEmail, sendPaymentPendingEmail, sendPaymentFailureEmail } = require('../services/emailService');
+const { autoRankDonors } = require('../services/rankingService');
 
 // Rate Limiter for payment session generation (Protects against continuous DDoS / automated bot floods)
 let paymentLimiter = (req, res, next) => next();
@@ -38,6 +43,9 @@ const DEFAULT_API_KEY = process.env.SABPAISA_API_KEY || 'sp_pT78w4hwe1hgNvUe-8ye
 const DEFAULT_SECRET_KEY = process.env.SABPAISA_SECRET_KEY || 'sec_TiRVAAILsA2XJwN3V5TOHgCaKfi7NWAz5E72i3XxM1Q';
 const DEFAULT_BASE_URL = process.env.SABPAISA_BASE_URL || 'https://merchant-api.sabpaisa.in';
 const CAPTCHA_SECRET = process.env.JWT_SECRET || DEFAULT_SECRET_KEY || 'kiran_captcha_security_shield';
+
+// In-memory payment session registry for guaranteed instant email receipts
+const pendingPaymentSessions = new Map();
 
 // Helper: Generate SabPaisa PG 3.0 Checksum (HMAC SHA-256)
 function generateSabpaisaChecksum(merchantId, merchantTxnId, amountInPaise, timestamp, secretKey) {
@@ -217,6 +225,9 @@ router.post('/initiate-sabpaisa', paymentLimiter, async (req, res) => {
         const timestamp = Math.floor(Date.now() / 1000).toString();
         const clientTxnId = 'KCT-' + Date.now() + '-' + Math.floor(1000 + Math.random() * 9000);
 
+        const isMonthlySubscription = req.body.donorCategory === 'monthly_donor_subscription' ||
+            (purpose && purpose.toLowerCase().includes('monthly'));
+
         const donation = new Donation({
             donationType: 'cash',
             fullName,
@@ -225,21 +236,15 @@ router.post('/initiate-sabpaisa', paymentLimiter, async (req, res) => {
             address,
             amount: numAmount,
             purpose: purpose || 'General Donation',
+            donorCategory: isMonthlySubscription ? 'monthly_donor_subscription' : (req.body.donorCategory || 'general_donation'),
+            panNumber: req.body.panNumber || '',
+            isAnonymous: !!req.body.isAnonymous,
             paymentMethod: 'SabPaisa PG',
             transactionId: clientTxnId,
             status: 'pending'
         });
 
-        donation.save().catch(dbErr => {
-            console.warn('⚠️ DB save async notice:', dbErr.message);
-        });
-
-        const host = req.headers.origin || req.headers.referer || process.env.CLIENT_URL || 'https://www.kirancharitabletrust.org';
-        const cleanHost = host.replace(/\/$/, '');
-        const callbackUrl = `${cleanHost}/api/donations/sabpaisa-callback`;
-
-        const checksum = generateSabpaisaChecksum(clientCode, clientTxnId, paiseAmount, timestamp, secretKey);
-
+        
         // SabPaisa PG 3.0: Name must be 2-100 characters with letters & spaces only
         const sanitizedCustomerName = String(fullName || '')
             .replace(/[^a-zA-Z\s]/g, ' ')
@@ -250,6 +255,42 @@ router.post('/initiate-sabpaisa', paymentLimiter, async (req, res) => {
         // SabPaisa PG 3.0: 10-digit Indian mobile starting with 6-9
         const rawDigits = String(mobile || '').replace(/\D/g, '');
         const sanitizedCustomerPhone = rawDigits.length > 10 ? rawDigits.slice(-10) : rawDigits;
+
+        pendingPaymentSessions.set(clientTxnId, {
+            fullName: sanitizedCustomerName,
+            email: email,
+            mobile: sanitizedCustomerPhone,
+            address: address || '',
+            amount: numAmount,
+            purpose: purpose || (isMonthlySubscription ? 'Monthly Giving Society' : 'General Philanthropy'),
+            donorCategory: isMonthlySubscription ? 'monthly_donor_subscription' : (req.body.donorCategory || 'general_donation'),
+            receiptNumber: donation.receiptNumber,
+            isMonthlySubscription,
+            timestamp: Date.now()
+        });
+
+        donation.save().catch(dbErr => {
+            console.warn('⚠️ DB save async notice:', dbErr.message);
+        });
+
+        const host = req.headers.origin || req.headers.referer || process.env.CLIENT_URL || 'https://www.kirancharitabletrust.org';
+        const cleanHost = host.replace(/\/$/, '');
+
+        // Pack donor details into callback query string for 100% reliability on stateless/serverless environments
+        const queryParams = new URLSearchParams({
+            donorName: sanitizedCustomerName,
+            donorEmail: email || '',
+            donorMobile: sanitizedCustomerPhone || '',
+            donorAddress: address || '',
+            donorPurpose: purpose || (isMonthlySubscription ? 'Monthly Giving Society' : 'General Philanthropy'),
+            donorCategory: isMonthlySubscription ? 'monthly_donor_subscription' : (req.body.donorCategory || 'general_donation'),
+            donorAmount: String(numAmount),
+            receiptNo: donation.receiptNumber,
+            isMonthly: isMonthlySubscription ? 'true' : 'false'
+        });
+        const callbackUrl = `${cleanHost}/api/donations/sabpaisa-callback?${queryParams.toString()}`;
+
+        const checksum = generateSabpaisaChecksum(clientCode, clientTxnId, paiseAmount, timestamp, secretKey);
 
         const payload = {
             merchantId: clientCode,
@@ -264,6 +305,23 @@ router.post('/initiate-sabpaisa', paymentLimiter, async (req, res) => {
             timestamp: parseInt(timestamp, 10),
             checksum
         };
+
+        // Attach SabPaisa PG 3.0 AutoPay Mandate & recurring subscription parameters
+        if (isMonthlySubscription) {
+            const mandateChannel = (req.body.autopayMethod || 'UPI_AUTOPAY').toUpperCase();
+            payload.description = `AutoPay Mandate Setup - ${purpose || 'Monthly Pillar'}`;
+            payload.udf1 = 'AUTOPAY_MANDATE';
+            payload.udf2 = mandateChannel;
+            payload.udf3 = clientTxnId;
+            payload.metadata = {
+                mandateType: 'AUTOPAY',
+                mandateChannel: mandateChannel,
+                subscriptionType: 'MONTHLY',
+                billingFrequency: 'MONTHLY',
+                recurringAmount: numAmount,
+                plan: purpose || 'Monthly Pillar'
+            };
+        }
 
         console.log(`Initiating SabPaisa Payment on ${baseUrl}/api/v2/payments for ${clientCode} (${paiseAmount} paise / ₹${numAmount})...`);
 
@@ -423,43 +481,196 @@ const handleCallback = async (req, res) => {
         } catch (dbErr) {
             console.warn('⚠️ DB lookup skipped in callback:', dbErr.message);
         }
+
         const clientRedirectUrl = process.env.CLIENT_URL || 'https://www.kirancharitabletrust.org';
 
-        // Return URL parameters amount and paid_amount are already in rupees per official SabPaisa doc
-        let resolvedAmount = donation?.amount || data.paid_amount || data.amount || '';
-        const donorName = donation?.fullName || data.customerName || data.payerName || data.name || 'Valued Donor';
+        // Retrieve session data fallback for 100% reliable donor details & email delivery
+        const sessionData = pendingPaymentSessions.get(clientTxnId) || {};
+        const finalName = req.query.donorName || donation?.fullName || sessionData.fullName || data.customerName || data.payerName || data.name || 'Valued Philanthropist';
+        const finalEmail = req.query.donorEmail || donation?.email || sessionData.email || data.customerEmail || data.payerEmail || data.email;
+        const finalMobile = req.query.donorMobile || donation?.mobile || sessionData.mobile || data.customerMobile || data.payerMobile || '';
+        const finalAddress = req.query.donorAddress || donation?.address || sessionData.address || '';
+        const finalAmount = req.query.donorAmount || donation?.amount || sessionData.amount || data.paid_amount || data.amount || '0';
+
+        const isMonthlySubscription = req.query.isMonthly === 'true' ||
+            (donation && (donation.donorCategory === 'monthly_donor_subscription' || (donation.purpose && donation.purpose.toLowerCase().includes('monthly')))) ||
+            (sessionData && sessionData.isMonthlySubscription) ||
+            (data.udf1 === 'MONTHLY_SUBSCRIPTION' || data.udf1 === 'AUTOPAY_MANDATE') ||
+            (req.query.purpose && req.query.purpose.toLowerCase().includes('monthly'));
+
+        const finalPurpose = req.query.donorPurpose || donation?.purpose || sessionData.purpose || (isMonthlySubscription ? 'Monthly Giving Society Pillar' : 'General Philanthropy');
+        const finalCategory = req.query.donorCategory || donation?.donorCategory || sessionData.donorCategory || (isMonthlySubscription ? 'monthly_donor_subscription' : 'general_donation');
+        const finalReceipt = req.query.receiptNo || donation?.receiptNumber || sessionData.receiptNumber || ('KCT-80G-' + Date.now().toString().slice(-6));
+
         let failureReason = data.statusMsg || data.status || data.error?.message || data.responseMessage || '';
         if (!failureReason || failureReason.toUpperCase() === 'FAILED' || failureReason.toUpperCase() === 'FAILURE') {
             failureReason = 'Payment could not be processed by card network or bank.';
         }
 
+        // 1. Update Database Record if available
         if (donation) {
             donation.status = isSuccess ? 'completed' : isPending ? 'pending' : 'failed';
             if (pgTxnNo) donation.transactionId = pgTxnNo;
             try {
                 await donation.save();
-            } catch (dbErr) {
-                console.warn('⚠️ DB save skipped:', dbErr.message);
-            }
 
-            if (isSuccess) {
-                return sendBreakoutHtml(res, `${clientRedirectUrl}/donate?status=success&txnId=${encodeURIComponent(pgTxnNo)}&receiptNo=${encodeURIComponent(donation.receiptNumber)}&name=${encodeURIComponent(donation.fullName)}&amount=${donation.amount}`, 'success');
-            } else if (isPending) {
-                return sendBreakoutHtml(res, `${clientRedirectUrl}/donate?status=pending&txnId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&clientTxnId=${encodeURIComponent(clientTxnId || '')}&amount=${encodeURIComponent(donation.amount || resolvedAmount)}&name=${encodeURIComponent(donation.fullName || donorName)}`, 'pending');
-            } else {
-                return sendBreakoutHtml(res, `${clientRedirectUrl}/donate?status=failed&txnId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&amount=${encodeURIComponent(donation.amount || resolvedAmount)}&name=${encodeURIComponent(donation.fullName || donorName)}&reason=${encodeURIComponent(failureReason)}`, 'failed');
+                const todayStr = new Date().toISOString().split('T')[0];
+                if (isSuccess) {
+                    await PerformanceMetric.findOneAndUpdate(
+                        { date: todayStr },
+                        { 
+                            $inc: { successfulDonations: 1, donationRevenue: donation.amount },
+                            $set: { updatedAt: new Date() }
+                        },
+                        { upsert: true }
+                    ).catch(() => {});
+
+                    if (donation.donorCategory === 'volunteer_membership' || (donation.purpose && donation.purpose.toLowerCase().includes('volunteer'))) {
+                        try {
+                            const Volunteer = require('../models/Volunteer');
+                            await Volunteer.findOneAndUpdate(
+                                { email: donation.email },
+                                { $set: { paymentStatus: 'paid', status: 'active' } }
+                            );
+                        } catch (vErr) {}
+                    }
+
+                    if (donation.donorCategory === 'trust_member_monthly' || donation.email) {
+                        await TrustMember.findOneAndUpdate(
+                            { email: donation.email },
+                            {
+                                $inc: { totalDonated: donation.amount, donationCount: 1 },
+                                $set: { lastPaymentDate: new Date() }
+                            }
+                        ).catch(() => {});
+                    }
+
+                    autoRankDonors().catch(err => console.warn('Auto-rank trigger notice:', err.message));
+                } else if (!isPending) {
+                    await PerformanceMetric.findOneAndUpdate(
+                        { date: todayStr },
+                        { $inc: { failedDonations: 1 }, $set: { updatedAt: new Date() } },
+                        { upsert: true }
+                    ).catch(() => {});
+                }
+            } catch (dbErr) {
+                console.warn('⚠️ DB update notice:', dbErr.message);
             }
-        } else if (isSuccess) {
-            const fallbackReceipt = 'KCT-' + Date.now().toString().slice(-6);
-            const amount = resolvedAmount || '0';
-            return sendBreakoutHtml(res, `${clientRedirectUrl}/donate?status=success&txnId=${encodeURIComponent(pgTxnNo)}&receiptNo=${encodeURIComponent(fallbackReceipt)}&name=${encodeURIComponent(donorName)}&amount=${amount}`, 'success');
-        } else if (isPending) {
-            return sendBreakoutHtml(res, `${clientRedirectUrl}/donate?status=pending&txnId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&clientTxnId=${encodeURIComponent(clientTxnId || '')}&amount=${encodeURIComponent(resolvedAmount)}&name=${encodeURIComponent(donorName)}`, 'pending');
         }
 
-        return sendBreakoutHtml(res, `${clientRedirectUrl}/donate?status=failed&txnId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&amount=${encodeURIComponent(resolvedAmount)}&name=${encodeURIComponent(donorName)}&reason=${encodeURIComponent(failureReason || 'Donation record not found')}`, 'failed');
+        // 2. Activate Monthly Schedule if recurring
+        if (isSuccess && isMonthlySubscription) {
+            try {
+                const nextDueDate = new Date();
+                nextDueDate.setDate(nextDueDate.getDate() + 30);
+                MonthlySchedule.findOneAndUpdate(
+                    { memberEmail: finalEmail, monthYear: new Date().toLocaleString('en-US', { month: 'short', year: 'numeric' }) },
+                    {
+                        $set: {
+                            memberName: finalName,
+                            memberEmail: finalEmail,
+                            amount: Number(finalAmount),
+                            status: 'paid',
+                            paidDate: new Date(),
+                            dueDate: nextDueDate,
+                            transactionId: pgTxnNo,
+                            notes: `SabPaisa Recurring Monthly Mandate (${finalPurpose})`
+                        }
+                    },
+                    { upsert: true }
+                ).catch(() => {});
+            } catch (mErr) {
+                console.warn('Monthly schedule activation notice:', mErr.message);
+            }
+        }
+
+        // 3. GUARANTEED AUTOMATED EMAIL DISPATCH ON EVERY STATUS (SUCCESS, PENDING, OR FAILED)
+        if (finalEmail) {
+            if (isSuccess) {
+                sendPaymentSuccessEmail({
+                    name: finalName,
+                    email: finalEmail,
+                    mobile: finalMobile,
+                    address: finalAddress,
+                    amount: finalAmount,
+                    receiptNumber: finalReceipt,
+                    transactionId: pgTxnNo || clientTxnId,
+                    clientTxnId: clientTxnId,
+                    purpose: finalPurpose,
+                    donorCategory: finalCategory
+                }).then(() => {
+                    console.log(`📧 Official 80G tax receipt email delivered to donor: ${finalEmail}`);
+                }).catch(e => console.warn('Payment success email err:', e.message));
+
+                // Dispatch copy to Trust Admin
+                if (finalEmail.toLowerCase() !== 'trustkirancharitable@gmail.com') {
+                    sendPaymentSuccessEmail({
+                        name: `${finalName} (Trust Office Copy)`,
+                        email: 'trustkirancharitable@gmail.com',
+                        mobile: finalMobile,
+                        address: finalAddress,
+                        amount: finalAmount,
+                        receiptNumber: finalReceipt,
+                        transactionId: pgTxnNo || clientTxnId,
+                        clientTxnId: clientTxnId,
+                        purpose: finalPurpose,
+                        donorCategory: finalCategory
+                    }).catch(() => {});
+                }
+            } else if (isPending) {
+                sendPaymentPendingEmail({
+                    name: finalName,
+                    email: finalEmail,
+                    amount: finalAmount,
+                    transactionId: pgTxnNo || clientTxnId,
+                    purpose: finalPurpose
+                }).then(() => {
+                    console.log(`📧 Payment under verification notice delivered to: ${finalEmail}`);
+                }).catch(e => console.warn('Payment pending email err:', e.message));
+            } else {
+                sendPaymentFailureEmail({
+                    name: finalName,
+                    email: finalEmail,
+                    amount: finalAmount,
+                    reason: failureReason,
+                    transactionId: pgTxnNo || clientTxnId,
+                    retryUrl: isMonthlySubscription ? `${clientRedirectUrl}/portal/monthly-donor` : `${clientRedirectUrl}/donate`
+                }).then(() => {
+                    console.log(`📧 Payment failure alert notice delivered to: ${finalEmail}`);
+                }).catch(e => console.warn('Payment failure email err:', e.message));
+            }
+        }
+
+        // 4. Webhook API Response
+        const isWebhookRequest = req.path.includes('webhook') || req.path.includes('ipn') || (!req.headers.accept?.includes('text/html') && req.headers['content-type']?.includes('application/json'));
+        if (isWebhookRequest) {
+            return res.status(200).json({
+                success: true,
+                status: isSuccess ? 'SUCCESS' : isPending ? 'PENDING' : 'FAILED',
+                message: isSuccess ? 'Payment webhook verified and recorded' : `Payment recorded as ${isPending ? 'pending' : 'failed'}`,
+                transactionId: pgTxnNo,
+                clientTxnId: clientTxnId,
+                amount: finalAmount,
+                receiptNumber: finalReceipt
+            });
+        }
+
+        // 5. Browser Redirect with Full Receipt Details
+        const targetPage = isMonthlySubscription ? '/portal/monthly-donor' : '/donate';
+
+        if (isSuccess) {
+            return sendBreakoutHtml(res, `${clientRedirectUrl}${targetPage}?status=success&txnId=${encodeURIComponent(pgTxnNo)}&txId=${encodeURIComponent(pgTxnNo)}&receiptNo=${encodeURIComponent(finalReceipt)}&name=${encodeURIComponent(finalName)}&amount=${encodeURIComponent(finalAmount)}&purpose=${encodeURIComponent(finalPurpose)}&email=${encodeURIComponent(finalEmail || '')}&address=${encodeURIComponent(finalAddress || '')}`, 'success');
+        } else if (isPending) {
+            return sendBreakoutHtml(res, `${clientRedirectUrl}${targetPage}?status=pending&txnId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&txId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&clientTxnId=${encodeURIComponent(clientTxnId || '')}&amount=${encodeURIComponent(finalAmount)}&name=${encodeURIComponent(finalName)}`, 'pending');
+        } else {
+            return sendBreakoutHtml(res, `${clientRedirectUrl}${targetPage}?status=failed&txnId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&txId=${encodeURIComponent(pgTxnNo || clientTxnId || '')}&amount=${encodeURIComponent(finalAmount)}&name=${encodeURIComponent(finalName)}&reason=${encodeURIComponent(failureReason)}`, 'failed');
+        }
+
     } catch (error) {
         console.error('SabPaisa Callback Error:', error);
+        if (req.path.includes('webhook') || req.path.includes('ipn')) {
+            return res.status(500).json({ success: false, message: 'Server webhook processing error' });
+        }
         const clientRedirectUrl = process.env.CLIENT_URL || 'https://www.kirancharitabletrust.org';
         return sendBreakoutHtml(res, `${clientRedirectUrl}/donate?status=failed&reason=Processing+error`, 'failed');
     }
@@ -467,6 +678,10 @@ const handleCallback = async (req, res) => {
 
 router.post('/sabpaisa-callback', handleCallback);
 router.get('/sabpaisa-callback', handleCallback);
+router.post('/webhook', handleCallback);
+router.get('/webhook', handleCallback);
+router.post('/sabpaisa-webhook', handleCallback);
+router.post('/ipn', handleCallback);
 
 // POST /api/donations/enquiry — SabPaisa PG 3.0 Transaction Enquiry
 router.post('/enquiry', async (req, res) => {

@@ -1,4 +1,6 @@
+const path = require('path');
 try {
+    require('dotenv').config({ path: path.join(__dirname, '.env') });
     require('dotenv').config();
 } catch (e) {
     // Environment variables injected directly in serverless environment
@@ -39,6 +41,7 @@ app.use((req, res, next) => {
 });
 
 // Database Connection Manager (Supports Serverless & Standalone Server)
+mongoose.set('bufferCommands', false);
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/kiran-charitable-trust';
 
 let isConnecting = false;
@@ -122,10 +125,18 @@ app.use((req, res, next) => {
     next();
 });
 
+// Static directory for uploaded profile photos
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // API Routes
-app.use('/api/contact', require('./routes/contact'));
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/volunteers', require('./routes/volunteers'));
+app.use('/api/trust-members', require('./routes/trustMembers'));
+app.use('/api/donors', require('./routes/donors'));
+app.use('/api/admin', require('./routes/admin'));
 app.use('/api/donations', require('./routes/donations'));
+app.use('/api/payment', require('./routes/donations'));
+app.use('/api/contact', require('./routes/contact'));
 
 // Root & Health check endpoints
 app.get('/api/health', (req, res) => {

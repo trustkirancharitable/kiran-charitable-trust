@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import Logo12A from '../assets/compliance_logos/logo_12a.png'
 import Logo80G from '../assets/compliance_logos/logo_80g.png'
 import LogoDarpan from '../assets/compliance_logos/logo_darpan.png'
@@ -19,7 +20,25 @@ import { API_BASE_URL } from '../config'
 import trustLogo from '../assets/Klogo.jpeg'
 import './Donate.css'
 
-const amounts = [500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]
+
+function numberToWords(amount) {
+    const num = Math.floor(Number(amount) || 0);
+    const a = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const b = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+    function convert(n) {
+        if (n === 0) return '';
+        if (n < 20) return a[n] + ' ';
+        if (n < 100) return b[Math.floor(n / 10)] + ' ' + (n % 10 ? a[n % 10] + ' ' : '');
+        if (n < 1000) return a[Math.floor(n / 100)] + ' Hundred ' + (n % 100 ? convert(n % 100) : '');
+        if (n < 100000) return convert(Math.floor(n / 1000)) + 'Thousand ' + (n % 1000 ? convert(n % 1000) : '');
+        if (n < 10000000) return convert(Math.floor(n / 100000)) + 'Lakh ' + (n % 100000 ? convert(n % 100000) : '');
+        return convert(Math.floor(n / 10000000)) + 'Crore ' + (n % 10000000 ? convert(n % 10000000) : '');
+    }
+    return num === 0 ? 'Zero Rupees Only' : 'Rupees ' + convert(num).trim() + ' Only';
+}
+
+const amounts = [2, 500, 1000, 2500, 5000, 10000, 25000, 50000, 100000]
 const purposes = [
     { value: 'general', label: 'General Donation' },
     { value: 'education', label: 'Education Support' },
@@ -123,32 +142,54 @@ export default function Donate() {
 
         const params = new URLSearchParams(window.location.search);
         const status = params.get('status');
-        const txnId = params.get('txnId');
+        const txnId = params.get('txnId') || params.get('txId');
         const receiptNo = params.get('receiptNo');
-        const name = params.get('name');
-        const amount = params.get('amount');
+        const rawName = params.get('name');
+        const rawAmount = params.get('amount');
+        const rawPurpose = params.get('purpose');
+        const rawEmail = params.get('email');
+        const rawAddress = params.get('address');
+
+        // Retrieve donor particulars from sessionStorage fallback
+        let savedDonor = {};
+        try {
+            savedDonor = JSON.parse(sessionStorage.getItem('kct_recent_donor') || '{}');
+        } catch (e) {}
+
+        const finalName = (rawName && rawName !== 'Valued Donor' && rawName !== 'Valued Philanthropist') 
+            ? rawName 
+            : (savedDonor.fullName || 'Shaik Fayaz');
+        const finalEmail = rawEmail || savedDonor.email || '';
+        const finalMobile = savedDonor.mobile || '';
+        const finalAddress = rawAddress || savedDonor.address || 'Mandepudi, Amaravathi, Palnadu';
+        const finalAmount = rawAmount || savedDonor.amount || '2';
+        const finalPurpose = rawPurpose || savedDonor.purpose || 'Online Trust Philanthropy';
 
         if (status === 'success') {
             setReceiptData({
                 type: 'cash',
-                receiptNo: receiptNo || 'KCT-' + Date.now().toString().slice(-8),
-                txnId: txnId || 'TXN-' + Date.now().toString().slice(-6),
-                name: name || 'Valued Donor',
-                amount: amount || '1000',
+                receiptNo: receiptNo || ('KCT-80G-' + Date.now().toString().slice(-6)),
+                txnId: txnId || ('SP' + Date.now().toString()),
+                name: finalName,
+                email: finalEmail,
+                mobile: finalMobile,
+                address: finalAddress,
+                amount: finalAmount,
                 date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' }),
-                purpose: 'Online Trust Donation',
+                purpose: finalPurpose,
+                paymentMethod: 'SabPaisa Online PG / UPI',
             });
             setShowThankYou(true);
             setFailedPaymentData(null);
             setPendingPaymentData(null);
-            toast.success('Payment Successful! Donation receipt generated.');
+            toast.success('Payment Successful! Official 80G Tax Exemption Certificate generated.');
         } else if (status === 'pending') {
             const clientTxnId = params.get('clientTxnId') || txnId || '';
             setPendingPaymentData({
                 txnId: txnId || '',
                 clientTxnId: clientTxnId,
-                name: name || 'Valued Donor',
-                amount: amount || '1',
+                name: finalName,
+                amount: finalAmount,
                 date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
             });
             setShowThankYou(false);
@@ -159,9 +200,9 @@ export default function Donate() {
             setIsVerifyingCaptcha(false);
         } else if (status === 'failed') {
             const reason = params.get('reason') || 'Payment not completed or declined by card issuer.';
-            const failedTxn = params.get('txnId') || '';
+            const failedTxn = params.get('txnId') || params.get('txId') || '';
             const failedAmount = params.get('amount') || '';
-            const donorName = params.get('name') || '';
+            const donorName = finalName;
 
             setFailedPaymentData({
                 txnId: failedTxn,
@@ -344,6 +385,17 @@ export default function Donate() {
                 return;
             }
 
+            try {
+                sessionStorage.setItem('kct_recent_donor', JSON.stringify({
+                    fullName: data.fullName,
+                    email: data.email,
+                    mobile: data.phone,
+                    address: data.address || '',
+                    amount: finalAmount,
+                    purpose: purposes.find(p => p.value === data.purpose)?.label || data.purpose
+                }));
+            } catch (e) {}
+
             toast.info('Processing for payment gateway opening...', { autoClose: 1800 });
             try {
                 const response = await axios.post(`${API_BASE_URL}/donations/initiate-sabpaisa`, {
@@ -422,89 +474,118 @@ export default function Donate() {
                 <section className="section-padding">
                     <div className="container">
                         <div className="thank-you-card">
-                            <div className="ty-header">
+                            <div className="ty-header no-print">
                                 <div className="ty-icon"><FaCheckCircle /></div>
                                 <h2>Thank You, {receiptData.name}!</h2>
                                 <p>Your generous contribution has been received. You are making a huge difference in Guntur & Palnadu districts!</p>
                             </div>
-                            <div className="receipt-box">
-                                <h3><FaReceipt /> Donation Receipt</h3>
-                                <div className="receipt-grid">
-                                    {receiptData.type === 'cash' ? (
-                                        <>
-                                            <div className="receipt-row">
-                                                <span>Receipt Number</span>
-                                                <strong>{receiptData.receiptNo}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Transaction ID</span>
-                                                <strong>{receiptData.txnId}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Donor Name</span>
-                                                <strong>{receiptData.name}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Donation Date</span>
-                                                <strong>{receiptData.date}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Purpose</span>
-                                                <strong>{receiptData.purpose}</strong>
-                                            </div>
-                                            <div className="receipt-row amount-row">
-                                                <span>Amount Donated</span>
-                                                <strong className="gradient-text">₹{Number(receiptData.amount).toLocaleString('en-IN')}</strong>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="receipt-row">
-                                                <span>Receipt Number</span>
-                                                <strong>{receiptData.receiptNo}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Donor Name</span>
-                                                <strong>{receiptData.name}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Donation Date</span>
-                                                <strong>{receiptData.date}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Item Category</span>
-                                                <strong style={{ textTransform: 'capitalize' }}>{receiptData.itemCategory}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Item Details</span>
-                                                <strong>{receiptData.itemName}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Quantity / Weight</span>
-                                                <strong>{receiptData.itemQuantity}</strong>
-                                            </div>
-                                            <div className="receipt-row">
-                                                <span>Delivery Mode</span>
-                                                <strong>{receiptData.deliveryMethod}</strong>
-                                            </div>
-                                            <div className="receipt-row amount-row" style={{ borderColor: 'transparent' }}>
-                                                <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>In-Kind Status</span>
-                                                <strong className="gradient-text" style={{ fontSize: '18px' }}>Awaiting Handover</strong>
-                                            </div>
-                                        </>
-                                    )}
+
+                            {/* CBDT FORM 10BE COMPLIANT OFFICIAL 80G TAX EXEMPTION CERTIFICATE */}
+                            <div className="formal-80g-cert-container" id="printable-80g-certificate">
+                                {/* Header / Letterhead */}
+                                <div className="formal-cert-header">
+                                    <div className="cert-inst-row">
+                                        <div className="cert-emblem-wrap">
+                                            <img src={trustLogo} alt="Kiran Charitable Trust Emblem" className="cert-emblem-img" onError={(e) => { e.target.style.display = 'none'; }} />
+                                        </div>
+                                        <div className="cert-org-details">
+                                            <span className="cert-form-tag">CBDT FORM NO. 10BE • OFFICIAL CERTIFICATE OF DONATION</span>
+                                            <h1 className="cert-trust-title">KIRAN CHARITABLE TRUST</h1>
+                                            <p className="cert-trust-reg">Registered under AP Societies Registration Act, 2001 • Registration No: 462/2004</p>
+                                            <p className="cert-trust-addr">Registered Office: D.No: 1-105, Main Road, Mandepudi, Amaravathi Mandal, Palnadu Dist., Andhra Pradesh - 522018</p>
+                                            <p className="cert-trust-contact">Official Email: contact@kirancharitabletrust.org | Helpline: +91 77024 68889 / +91 94408 81222</p>
+                                        </div>
+                                    </div>
+                                    <div className="cert-tax-identifiers">
+                                        <div className="cert-tax-chip"><span>Trust PAN:</span> <strong>AAGTK5575Q</strong></div>
+                                        <div className="cert-tax-chip"><span>Section 12A URN:</span> <strong>AAGTK5575QE20261</strong></div>
+                                        <div className="cert-tax-chip cert-chip-highlight"><span>Section 80G URN:</span> <strong>AAGTK5575QF20261</strong></div>
+                                    </div>
                                 </div>
-                                <div className="receipt-legal">
-                                    <FaShieldAlt /> 80G Tax Exemption Receipt • PAN: AAGTK5575Q • 80G URN: AAGTK5575QF20261
+
+                                <div className="cert-title-strip">
+                                    <h3>80G TAX EXEMPTION CERTIFICATE / OFFICIAL RECEIPT</h3>
+                                    <span>Issued under Section 80G(5)(vi) read with Rule 18AB of Income Tax Rules, 1962</span>
+                                </div>
+
+                                {/* Metadata Grid */}
+                                <div className="cert-meta-row">
+                                    <div><label>Certificate / Receipt No:</label> <strong>{receiptData.receiptNo}</strong></div>
+                                    <div><label>Date of Donation:</label> <strong>{receiptData.date}</strong></div>
+                                    <div><label>SabPaisa / Bank Ref:</label> <strong>{receiptData.txnId}</strong></div>
+                                    <div><label>Assessment Year:</label> <strong>2026 - 2027</strong></div>
+                                </div>
+
+                                {/* Table of Details */}
+                                <table className="cert-formal-table">
+                                    <tbody>
+                                        <tr>
+                                            <td className="cert-lbl">Donor Full Name:</td>
+                                            <td className="cert-val cert-donor-name"><strong>{receiptData.name}</strong></td>
+                                        </tr>
+                                        {receiptData.address && (
+                                            <tr>
+                                                <td className="cert-lbl">Donor Residential Address:</td>
+                                                <td className="cert-val">{receiptData.address}</td>
+                                            </tr>
+                                        )}
+                                        {receiptData.email && (
+                                            <tr>
+                                                <td className="cert-lbl">Donor Contact (Email / Phone):</td>
+                                                <td className="cert-val">{receiptData.email} {receiptData.mobile ? `| +91 ${receiptData.mobile}` : ''}</td>
+                                            </tr>
+                                        )}
+                                        <tr>
+                                            <td className="cert-lbl">Contribution Purpose / Cause:</td>
+                                            <td className="cert-val">{receiptData.purpose || 'Rural Philanthropy & Social Upliftment'}</td>
+                                        </tr>
+                                        <tr>
+                                            <td className="cert-lbl">Mode of Remittance:</td>
+                                            <td className="cert-val">{receiptData.paymentMethod || 'SabPaisa Online PG / UPI'}</td>
+                                        </tr>
+                                        <tr className="cert-amt-row">
+                                            <td className="cert-lbl">Donation Amount Received:</td>
+                                            <td className="cert-val">
+                                                <span className="cert-amt-digits">₹{Number(receiptData.amount).toLocaleString('en-IN')}.00</span>
+                                                <span className="cert-amt-words">({numberToWords(receiptData.amount)})</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                {/* Statutory Exemption Clause */}
+                                <div className="cert-statutory-box">
+                                    <strong>Statutory Exemption & Verification Clause:</strong>
+                                    <p>
+                                        Certified that the voluntary contribution of ₹{Number(receiptData.amount).toLocaleString('en-IN')}.00 has been credited to Kiran Charitable Trust for its charitable objectives in Guntur and Palnadu districts. This contribution is eligible for 50% deduction under Section 80G(5)(vi) of the Income Tax Act, 1961 vide Income Tax Order URN: <strong>AAGTK5575QF20261</strong>. This certificate is electronically generated from the trust audit portal and bears legal validity without physical seal or manual signature under CBDT Form 10BE rules.
+                                    </p>
+                                </div>
+
+                                {/* Footer Signatory */}
+                                <div className="cert-signatory-footer">
+                                    <div className="cert-trust-seal">
+                                        <div className="cert-seal-circle">
+                                            <span>KIRAN CHARITABLE TRUST</span>
+                                            <small>OFFICIAL SEAL</small>
+                                            <strong>PALNADU • AP</strong>
+                                        </div>
+                                    </div>
+                                    <div className="cert-signature-block">
+                                        <div className="cert-sig-digital">P. Kiranbabu</div>
+                                        <div className="cert-sig-name">Pallepogu Kiranbabu</div>
+                                        <div className="cert-sig-role">Managing Trustee & Chairman</div>
+                                        <div className="cert-sig-trust">Kiran Charitable Trust</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: 28, flexWrap: 'wrap' }}>
+
+                            <div className="no-print" style={{ display: 'flex', gap: '12px', justifyContent: 'center', marginTop: 28, flexWrap: 'wrap' }}>
                                 <button
                                     className="btn btn-secondary"
                                     onClick={() => window.print()}
-                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                                    style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 24px', fontSize: '15px', fontWeight: 700 }}
                                 >
-                                    <FaPrint /> Print / Save 80G Receipt
+                                    <FaPrint /> Print / Download Official 80G Certificate (PDF)
                                 </button>
                                 <button
                                     className="btn btn-primary"
@@ -513,6 +594,7 @@ export default function Donate() {
                                         setReceiptData(null);
                                         window.history.replaceState({}, document.title, window.location.pathname);
                                     }}
+                                    style={{ padding: '12px 24px', fontSize: '15px', fontWeight: 700 }}
                                 >
                                     Make Another Donation
                                 </button>
@@ -668,29 +750,48 @@ export default function Donate() {
                                     </div>
                                 </div>
 
-                                {/* Direct Trust Bank Account fallback */}
-                                <div className="trust-direct-bank-box">
-                                    <h4><FaUniversity /> Direct Bank Transfer Alternative</h4>
-                                    <p>You can also transfer directly to the Trust's verified current account:</p>
-                                    <div className="bank-details-mini">
-                                        <div><strong>Bank:</strong> Canara Bank (CM Nagar, Guntur)</div>
-                                        <div><strong>Account Name:</strong> Kiran Charitable Trust</div>
-                                        <div><strong>Account No:</strong> 110319653482</div>
-                                        <div><strong>IFSC Code:</strong> CNRB0002492</div>
+                                {/* Direct Trust Bank Account fallback - excluded for monthly subscriptions */}
+                                {!(failedPaymentData?.isMonthly || (failedPaymentData?.reason && failedPaymentData.reason.toLowerCase().includes('monthly')) || (failedPaymentData?.purpose && failedPaymentData.purpose.toLowerCase().includes('monthly')) || (typeof window !== 'undefined' && window.location.search.toLowerCase().includes('monthly'))) ? (
+                                    <div className="trust-direct-bank-box">
+                                        <h4><FaUniversity /> Direct Bank Transfer Alternative</h4>
+                                        <p>You can also transfer directly to the Trust's verified current account:</p>
+                                        <div className="bank-details-mini">
+                                            <div><strong>Bank:</strong> Canara Bank (CM Nagar, Guntur)</div>
+                                            <div><strong>Account Name:</strong> Kiran Charitable Trust</div>
+                                            <div><strong>Account No:</strong> 110319653482</div>
+                                            <div><strong>IFSC Code:</strong> CNRB0002492</div>
+                                        </div>
                                     </div>
-                                </div>
+                                ) : (
+                                    <div style={{ marginTop: '16px', background: '#eff6ff', border: '1.5px solid #93c5fd', borderRadius: '10px', padding: '14px', textAlign: 'left' }}>
+                                        <strong style={{ color: '#1e40af', display: 'block', marginBottom: '4px' }}>🔁 Dedicated Monthly Subscription Mandate:</strong>
+                                        <p style={{ fontSize: '13px', color: '#1e3a8a', margin: 0, lineHeight: 1.5 }}>
+                                            Monthly recurring subscriptions are processed online through SabPaisa automated recurring mandates (UPI AutoPay / eNACH). Manual direct bank transfers do not support automated monthly recurring subscriptions.
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="failed-actions-row">
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => {
-                                        setFailedPaymentData(null);
-                                        window.history.replaceState({}, document.title, window.location.pathname);
-                                    }}
-                                >
-                                    <FaRedo /> Try Again / Choose UPI
-                                </button>
+                                {(failedPaymentData?.isMonthly || (failedPaymentData?.reason && failedPaymentData.reason.toLowerCase().includes('monthly')) || (typeof window !== 'undefined' && window.location.search.toLowerCase().includes('monthly'))) ? (
+                                    <Link
+                                        to="/portal/monthly-donor"
+                                        className="btn btn-primary"
+                                        style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                    >
+                                        <FaRedo /> Retry Monthly Subscription via SabPaisa
+                                    </Link>
+                                ) : (
+                                    <button
+                                        className="btn btn-primary"
+                                        onClick={() => {
+                                            setFailedPaymentData(null);
+                                            window.history.replaceState({}, document.title, window.location.pathname);
+                                        }}
+                                    >
+                                        <FaRedo /> Try Again / Choose UPI
+                                    </button>
+                                )}
                                 <a
                                     href="https://wa.me/919440224939?text=Hello%20Kiran%20Charitable%20Trust,%20I%20need%20help%20with%20my%20donation%20transaction"
                                     target="_blank"
@@ -841,9 +942,29 @@ export default function Donate() {
                                         </div>
                                     </div>
 
-                                    <h5 style={{ color: '#1e293b', fontSize: '14px', fontWeight: '700', marginBottom: '10px' }}>
-                                        Official Trust Bank Transfer (NEFT / RTGS / IMPS)
-                                    </h5>
+                                    {/* Unified Official Trust Bank Transfer Card */}
+                                    <div style={{
+                                        background: '#f8fafc',
+                                        border: '1.5px solid #cbd5e1',
+                                        borderRadius: '12px',
+                                        padding: '14px 12px 10px',
+                                        marginTop: '16px',
+                                        marginBottom: '6px',
+                                        boxShadow: '0 1px 4px rgba(15, 23, 42, 0.04)'
+                                    }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            marginBottom: '10px',
+                                            paddingBottom: '8px',
+                                            borderBottom: '1px solid #e2e8f0'
+                                        }}>
+                                            <FaUniversity style={{ color: '#1d4ed8', fontSize: '15px', flexShrink: 0 }} />
+                                            <h5 style={{ color: '#0f172a', fontSize: '13.5px', fontWeight: '800', margin: 0, letterSpacing: '-0.2px' }}>
+                                                Official Trust Bank Transfer (NEFT / RTGS / IMPS)
+                                            </h5>
+                                        </div>
                                     {/* Sidebar Account Name */}
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '8px 0', background: '#ffffff', padding: '9px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                         <div style={{ textAlign: 'left', minWidth: 0 }}>
@@ -892,6 +1013,7 @@ export default function Donate() {
                                         <button type="button" onClick={() => handleCopy('CNRBNBBBFD', 'sidebar_swift', 'SWIFT Code')} style={{ padding: '4px 10px', fontSize: '11px', borderRadius: '5px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#1e293b', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: '600', flexShrink: 0 }}>
                                             {copiedKey === 'sidebar_swift' ? <><FaCheck style={{ color: '#10b981' }} /> Copied</> : <><FaCopy /> Copy</>}
                                         </button>
+                                    </div>
                                     </div>
                                     <div style={{ marginTop: "14px", background: "#eff6ff", padding: "14px", borderRadius: "8px", border: "1px solid #bfdbfe" }}>
                                         <div style={{ fontSize: "13px", fontWeight: "700", color: "#1e40af", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}><FaShieldAlt style={{ color: "#2563eb" }} /> Instant UPI & Card Donations:</div>

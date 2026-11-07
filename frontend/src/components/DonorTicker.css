@@ -1,0 +1,115 @@
+.donor-ticker-wrap {
+    background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 50%, #0f172a 100%);
+    border-bottom: 2px solid #f59e0b;
+    overflow: hidden;
+    position: relative;
+    height: 34px;
+    user-select: none;
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.donor-ticker-badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 10;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.4);
+}
+
+.donor-ticker-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: scrollTicker 30s linear infinite;
+    padding-left: 170px;
+}
+
+.donor-ticker-wrap:hover .donor-ticker-track {
+    animation-play-state: paused;
+}
+
+@keyframes scrollTicker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.donor-ticker-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 3px 12px;
+    border-radius: 30px;
+    margin-right: 18px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    height: 26px;
+}
+
+.donor-ticker-card:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #f59e0b;
+}
+
+.donor-ticker-card.highlight {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.5);
+}
+
+.donor-ticker-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #f59e0b;
+    background: #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f8fafc;
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.donor-ticker-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.donor-ticker-name {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.donor-ticker-tag {
+    font-size: 10.5px;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.donor-ticker-tag .amount {
+    color: #34d399;
+    font-weight: 800;
+}

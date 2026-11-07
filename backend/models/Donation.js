@@ -1,18 +1,55 @@
 const mongoose = require('mongoose');
 
 const donationSchema = new mongoose.Schema({
-    fullName: { type: String, required: true, trim: true },
-    mobile: { type: String, required: true },
-    email: { type: String, required: true, trim: true },
-    address: { type: String, required: true },
+    fullName: { 
+        type: String, 
+        required: true, 
+        trim: true 
+    },
+    mobile: { 
+        type: String, 
+        required: true,
+        trim: true 
+    },
+    email: { 
+        type: String, 
+        required: true, 
+        trim: true,
+        lowercase: true,
+        index: true 
+    },
+    address: { 
+        type: String, 
+        required: true 
+    },
     donationType: {
         type: String,
         default: 'cash'
     },
+    donorCategory: {
+        type: String,
+        enum: ['general', 'volunteer_membership', 'trust_member_monthly'],
+        default: 'general',
+        index: true
+    },
+    memberId: {
+        type: String,
+        sparse: true,
+        index: true
+    },
+    profilePhoto: {
+        type: String,
+        default: ''
+    },
+    isAnonymous: {
+        type: Boolean,
+        default: false
+    },
     amount: {
         type: Number,
         required: function () { return this.donationType === 'cash'; },
-        min: 0
+        min: 0,
+        index: true
     },
     purpose: {
         type: String,
@@ -26,10 +63,27 @@ const donationSchema = new mongoose.Schema({
     itemName: { type: String },
     itemQuantity: { type: String },
     deliveryMethod: { type: String },
-    transactionId: { type: String },
-    receiptNumber: { type: String },
-    status: { type: String, default: 'pending' },
-    createdAt: { type: Date, default: Date.now }
+    transactionId: { 
+        type: String, 
+        index: true 
+    },
+    receiptNumber: { 
+        type: String, 
+        unique: true, 
+        sparse: true, 
+        index: true 
+    },
+    status: { 
+        type: String, 
+        enum: ['pending', 'completed', 'failed'],
+        default: 'pending',
+        index: true 
+    },
+    createdAt: { 
+        type: Date, 
+        default: Date.now,
+        index: true 
+    }
 });
 
 donationSchema.pre('save', function () {
