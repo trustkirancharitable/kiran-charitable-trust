@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { initiateGoogleSignIn } from '../../utils/googleAuth';
 import './Portal.css';
 
 const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -275,7 +276,40 @@ export default function PortalJoin() {
 
                 <button
                   type="button"
-                  onClick={() => setError('Google OAuth active on live domain. Please use Email OTP for instant verification.')}
+                  onClick={() => {
+                    initiateGoogleSignIn({
+                      onSuccess: (profile) => {
+                        if (profile.email) {
+                          setForm(prev => ({
+                            ...prev,
+                            email: profile.email,
+                            name: profile.name || prev.name,
+                            photoPreview: profile.picture || prev.photoPreview
+                          }));
+                          setStep(2);
+                        } else if (profile.credential) {
+                          fetch(`${API}/api/auth/google`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ credential: profile.credential })
+                          })
+                            .then(r => r.json())
+                            .then(res => {
+                              if (res.success && res.user) {
+                                setForm(prev => ({
+                                  ...prev,
+                                  email: res.user.email,
+                                  name: res.user.name || prev.name
+                                }));
+                                setStep(2);
+                              }
+                            })
+                            .catch(() => setStep(2));
+                        }
+                      },
+                      onError: (err) => setError(err)
+                    });
+                  }}
                   style={{
                     width: '100%',
                     padding: '0.85rem',

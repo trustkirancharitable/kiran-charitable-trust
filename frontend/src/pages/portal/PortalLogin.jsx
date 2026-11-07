@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { initiateGoogleSignIn } from '../../utils/googleAuth';
 import './Portal.css';
 
 export default function PortalLogin() {
   const navigate = useNavigate();
-  const { loginWithPassword, sendOtp, verifyOtp, user, isAuthenticated } = useAuth();
+  const { loginWithPassword, sendOtp, verifyOtp, loginWithGoogle, user, isAuthenticated } = useAuth();
 
   const [mode, setMode] = useState('password'); // 'password' | 'otp'
   const [email, setEmail] = useState('');
@@ -257,7 +258,32 @@ export default function PortalLogin() {
 
           <button
             type="button"
-            onClick={() => setError('Google Sign-in available on live domain. Please use Email Password or OTP for instant local login.')}
+            onClick={() => {
+              initiateGoogleSignIn({
+                onSuccess: async (profile) => {
+                  let payload = {};
+                  if (profile.credential) {
+                    payload = { credential: profile.credential };
+                  } else {
+                    payload = {
+                      email: profile.email,
+                      name: profile.name,
+                      avatar: profile.picture,
+                      googleId: profile.sub
+                    };
+                  }
+                  setLoading(true);
+                  const res = await loginWithGoogle(payload);
+                  setLoading(false);
+                  if (res?.success) {
+                    navigate('/portal/profile');
+                  } else {
+                    setError(res?.message || 'Google sign-in failed.');
+                  }
+                },
+                onError: (err) => setError(err)
+              });
+            }}
             style={{
               width: '100%',
               padding: '0.85rem',

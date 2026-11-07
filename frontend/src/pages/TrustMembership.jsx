@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { initiateGoogleSignIn } from '../utils/googleAuth';
 import KLogo from '../assets/Klogo.jpeg';
 import './TrustMembership.css';
 
@@ -248,7 +249,34 @@ function RegisterModal({ onClose, initialTier }) {
 
             <button
               className="tm-google-signin"
-              onClick={() => setError('Google Sign-In ready in production. Please use Email OTP for instant verification.')}
+              onClick={() => {
+                initiateGoogleSignIn({
+                  onSuccess: (profile) => {
+                    if (profile.email) {
+                      set('email', profile.email);
+                      if (profile.name) set('name', profile.name);
+                      if (profile.picture) set('photoPreview', profile.picture);
+                      setStep(2);
+                    } else if (profile.credential) {
+                      fetch(`${API}/api/auth/google`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ credential: profile.credential })
+                      })
+                        .then(r => r.json())
+                        .then(res => {
+                          if (res.success && res.user) {
+                            set('email', res.user.email);
+                            set('name', res.user.name);
+                            setStep(2);
+                          }
+                        })
+                        .catch(() => setStep(2));
+                    }
+                  },
+                  onError: (err) => setError(err)
+                });
+              }}
             >
               <svg width="18" height="18" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.3l7.8 6.1C12.3 13 17.7 9.5 24 9.5z"/>

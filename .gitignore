@@ -26,3 +26,12 @@ Thumbs.db
 *.log
 
 .vercel
+
+backend/config/
+*.json
+!package*.json
+!tsconfig*.json
+
+trust-portal-standalone/
+
+backend/uploads/

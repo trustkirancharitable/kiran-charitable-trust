@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { GOOGLE_CLIENT_ID } from '../config';
 import { toast } from 'react-toastify';
 import { FaTimes, FaEnvelope, FaLock, FaCheckCircle, FaArrowRight, FaShieldAlt } from 'react-icons/fa';
 import './AuthModal.css';
@@ -111,30 +112,63 @@ export default function AuthModal() {
         }
     };
 
-    // Google Sign-In Handler
-    const handleGoogleSignIn = async () => {
-        // Fast direct Google popup / identity auth
+    // Official Google Cloud OAuth 2.0 Sign-In Handler
+    const handleGoogleSignIn = () => {
         try {
-            // Check if user has Google Identity Client available
-            if (window.google?.accounts?.id) {
+            if (window.google?.accounts?.oauth2) {
+                const client = window.google.accounts.oauth2.initTokenClient({
+                    client_id: GOOGLE_CLIENT_ID,
+                    scope: 'email profile openid',
+                    callback: async (tokenResponse) => {
+                        if (tokenResponse.error) {
+                            toast.error('Google Sign-in was cancelled.');
+                            return;
+                        }
+                        try {
+                            const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                                headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+                            });
+                            const profile = await userInfoRes.json();
+                            const res = await loginWithGoogle({
+                                email: profile.email,
+                                name: profile.name,
+                                avatar: profile.picture,
+                                googleId: profile.sub
+                            });
+                            if (res?.success) {
+                                toast.success(`Welcome, ${profile.name || profile.email}!`);
+                                closeAuthModal();
+                            } else {
+                                toast.error(res?.message || 'Google sign-in failed.');
+                            }
+                        } catch (err) {
+                            toast.error('Could not retrieve Google profile.');
+                        }
+                    }
+                });
+                client.requestAccessToken();
+            } else if (window.google?.accounts?.id) {
+                window.google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: async (response) => {
+                        if (response.credential) {
+                            const res = await loginWithGoogle({ credential: response.credential });
+                            if (res?.success) {
+                                toast.success('Signed in with Google!');
+                                closeAuthModal();
+                            } else {
+                                toast.error(res?.message || 'Google authentication failed.');
+                            }
+                        }
+                    }
+                });
                 window.google.accounts.id.prompt();
             } else {
-                // Prompt user for email directly or simulate instant Google token
-                const googleEmail = prompt('Enter your Google Email to sign in directly:', email || 'user@gmail.com');
-                if (googleEmail && googleEmail.includes('@')) {
-                    const googleName = googleEmail.split('@')[0];
-                    const res = await loginWithGoogle({
-                        email: googleEmail,
-                        name: googleName.charAt(0).toUpperCase() + googleName.slice(1),
-                        googleId: 'gid_' + Date.now()
-                    });
-                    if (res?.success) {
-                        toast.success(`Signed in as ${googleEmail} via Google`);
-                    }
-                }
+                toast.info('Google Sign-in service loading. Please try again in a moment.');
             }
         } catch (err) {
-            toast.error('Google Sign-in failed. Please try Email OTP.');
+            console.error('Google Sign-In Error:', err);
+            toast.error('Google Sign-In error. Please use Email OTP.');
         }
     };
 
