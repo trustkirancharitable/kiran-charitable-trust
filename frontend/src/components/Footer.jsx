@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { FaXTwitter } from 'react-icons/fa6'
 import {
     FaHeart, FaFacebook, FaInstagram, FaLinkedin,
-    FaYoutube, FaWhatsapp, FaMapMarkerAlt, FaPhone,
+    FaYoutube, FaWhatsapp, FaTelegram, FaMapMarkerAlt, FaPhone,
     FaEnvelope, FaClock
 } from 'react-icons/fa'
 import KLogo from '../assets/Klogo.jpeg'
@@ -31,7 +31,8 @@ export default function Footer() {
                         <div className="footer-socials">
                             <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
                             <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="X (Twitter)"><FaXTwitter /></a>
-                            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                            <a href="https://instagram.com/kiran_charitabletrust" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                            <a href="https://t.me/+od5qPd3bBMY3M2Y9" target="_blank" rel="noreferrer" aria-label="Telegram Channel" style={{ color: '#229ED9' }}><FaTelegram /></a>
                             <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
                             <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
                             <a href="https://wa.me/917702468889" target="_blank" rel="noreferrer" aria-label="WhatsApp"><FaWhatsapp /></a>
@@ -88,7 +89,11 @@ export default function Footer() {
                             </li>
                             <li>
                                 <FaWhatsapp />
-                                <a href="https://wa.me/917702468889">+91 77024 68889</a>
+                                <a href="https://wa.me/917702468889" target="_blank" rel="noreferrer">+91 77024 68889</a>
+                            </li>
+                            <li>
+                                <FaTelegram style={{ color: '#229ED9' }} />
+                                <a href="https://t.me/+od5qPd3bBMY3M2Y9" target="_blank" rel="noreferrer">Telegram: @kirancharitabletrust</a>
                             </li>
                             <li>
                                 <FaEnvelope />
