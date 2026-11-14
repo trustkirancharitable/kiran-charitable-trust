@@ -29,7 +29,7 @@ export default function Footer() {
                             and women empowerment since 2026. Registered under 80G & 12A.
                         </p>
                         <div className="footer-socials">
-                            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
+                            <a href="https://www.facebook.com/people/Kirancharitabletrust/61596555901129/" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
                             <a href="https://x.com/KiranTrust2026" target="_blank" rel="noreferrer" aria-label="X (Twitter)"><FaXTwitter /></a>
                             <a href="https://www.instagram.com/kiran_charitabletrust/" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
                             <a href="https://www.threads.net/@kiran_charitabletrust" target="_blank" rel="noreferrer" aria-label="Threads"><FaThreads /></a>
