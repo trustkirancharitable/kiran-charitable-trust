@@ -335,7 +335,10 @@ router.get('/developer-metrics', async (req, res) => {
         } catch (e) {}
 
         // Auto-Ranking Status
-        const leaderboard = getCachedLeaderboard();
+        const leaderboard = getCachedLeaderboard() || {};
+        const stats = leaderboard.stats || {};
+        const allTimeTop = Array.isArray(leaderboard.allTimeTop) ? leaderboard.allTimeTop : [];
+        const monthlyTop = Array.isArray(leaderboard.monthlyTop) ? leaderboard.monthlyTop : [];
 
         return res.json({
             success: true,
@@ -344,11 +347,11 @@ router.get('/developer-metrics', async (req, res) => {
             metricsHistory,
             rankingEngine: {
                 status: 'AUTO_ENGINE_ACTIVE',
-                lastRankedAt: leaderboard.lastUpdated,
-                evaluatedDonorsCount: leaderboard.stats.totalDonationsEvaluated,
-                topRankedAmount: leaderboard.stats.topDonorAmount,
-                allTimeCount: leaderboard.allTimeTop.length,
-                monthlyCount: leaderboard.monthlyTop.length
+                lastRankedAt: leaderboard.lastUpdated || new Date(),
+                evaluatedDonorsCount: stats.totalDonationsEvaluated || 0,
+                topRankedAmount: stats.topDonorAmount || 0,
+                allTimeCount: allTimeTop.length,
+                monthlyCount: monthlyTop.length
             }
         });
     } catch (err) {

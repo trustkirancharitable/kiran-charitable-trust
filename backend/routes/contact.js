@@ -39,10 +39,21 @@ router.post('/', async (req, res) => {
 // GET /api/contact - Admin list of inquiries
 router.get('/', async (req, res) => {
     try {
-        const contacts = await Contact.find().sort({ createdAt: -1 });
+        let contacts = [];
+        const mongoose = require('mongoose');
+        if (mongoose.connection.readyState >= 1) {
+            try {
+                contacts = await Contact.find().sort({ createdAt: -1 }).maxTimeMS(2000);
+            } catch (e) {}
+        }
+        if (!contacts || contacts.length === 0) {
+            const { memoryStore } = require('../services/supabaseService');
+            contacts = memoryStore.contacts || [];
+        }
         res.json({ success: true, data: contacts });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Server error' });
+        const { memoryStore } = require('../services/supabaseService');
+        res.json({ success: true, data: memoryStore.contacts || [] });
     }
 });
 
