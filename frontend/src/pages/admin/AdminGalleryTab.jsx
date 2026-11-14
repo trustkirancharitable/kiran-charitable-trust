@@ -80,7 +80,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
         setLoading(true);
         try {
             const headers = getAdminHeaders();
-            const res = await axios.get(`${API_BASE_URL}/api/admin/gallery/events`, headers);
+            const res = await axios.get(`${API_BASE_URL}/admin/gallery/events`, headers);
             if (res.data?.success && Array.isArray(res.data.events)) {
                 setEvents(res.data.events);
             }
@@ -156,7 +156,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
             };
 
             setUploadProgress(40);
-            const res = await axios.post(`${API_BASE_URL}/api/admin/gallery/events`, formData, {
+            const res = await axios.post(`${API_BASE_URL}/admin/gallery/events`, formData, {
                 headers,
                 onUploadProgress: (progressEvent) => {
                     if (progressEvent.total) {
@@ -240,7 +240,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
             };
 
             const eventId = editingEvent._id || editingEvent.id || editingEvent.slug;
-            const res = await axios.put(`${API_BASE_URL}/api/admin/gallery/events/${eventId}`, formData, { headers });
+            const res = await axios.put(`${API_BASE_URL}/admin/gallery/events/${eventId}`, formData, { headers });
 
             if (res.data?.success) {
                 toast.success('Event updated successfully');
@@ -261,7 +261,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
         try {
             const eventId = event._id || event.id || event.slug;
             const res = await axios.patch(
-                `${API_BASE_URL}/api/admin/gallery/events/${eventId}/publish`,
+                `${API_BASE_URL}/admin/gallery/events/${eventId}/publish`,
                 { isPublished: !event.isPublished },
                 getAdminHeaders()
             );
@@ -305,7 +305,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
         const { type, targetId, targetSubId } = confirmDelete;
         try {
             if (type === 'event') {
-                const res = await axios.delete(`${API_BASE_URL}/api/admin/gallery/events/${targetId}`, getAdminHeaders());
+                const res = await axios.delete(`${API_BASE_URL}/admin/gallery/events/${targetId}`, getAdminHeaders());
                 if (res.data?.success) {
                     toast.success('Event and all associated photos deleted from Cloudflare R2.');
                     setEvents(prev => prev.filter(e => (e._id !== targetId && e.id !== targetId && e.slug !== targetId)));
@@ -315,7 +315,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
                 }
             } else if (type === 'image') {
                 const res = await axios.delete(
-                    `${API_BASE_URL}/api/admin/gallery/events/${targetId}/images/${targetSubId}`,
+                    `${API_BASE_URL}/admin/gallery/events/${targetId}/images/${targetSubId}`,
                     getAdminHeaders()
                 );
                 if (res.data?.success) {
@@ -356,7 +356,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
 
             const eventId = manageEvent._id || manageEvent.id || manageEvent.slug;
             const res = await axios.post(
-                `${API_BASE_URL}/api/admin/gallery/events/${eventId}/images`,
+                `${API_BASE_URL}/admin/gallery/events/${eventId}/images`,
                 formData,
                 { headers }
             );
@@ -397,7 +397,7 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
 
         try {
             const res = await axios.patch(
-                `${API_BASE_URL}/api/admin/gallery/events/${eventId}/reorder`,
+                `${API_BASE_URL}/admin/gallery/events/${eventId}/reorder`,
                 { orderedImageIds: orderedIds },
                 getAdminHeaders()
             );

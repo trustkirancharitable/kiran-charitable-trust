@@ -38,8 +38,8 @@ export default function Gallery() {
         setLoading(true)
         try {
             const url = activeCategory === 'all'
-                ? `${API_BASE_URL}/api/gallery/events`
-                : `${API_BASE_URL}/api/gallery/events?category=${activeCategory}`
+                ? `${API_BASE_URL}/gallery/events`
+                : `${API_BASE_URL}/gallery/events?category=${activeCategory}`
 
             const res = await axios.get(url)
             if (res.data?.success && Array.isArray(res.data.events)) {
