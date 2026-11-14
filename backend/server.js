@@ -167,6 +167,8 @@ app.use('/api/volunteers', require('./routes/volunteers'));
 app.use('/api/trust-members', require('./routes/trustMembers'));
 app.use('/api/donors', require('./routes/donors'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/gallery', require('./routes/gallery'));
+app.use('/api/admin/gallery', require('./routes/gallery'));
 app.use('/api/donations', require('./routes/donations'));
 app.use('/api/payment', require('./routes/donations'));
 app.use('/api/contact', require('./routes/contact'));

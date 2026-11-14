@@ -6114,5 +6114,187 @@
       "created_at": "2026-11-06T10:42:22.584Z",
       "createdAt": "2026-11-06T10:42:22.584Z"
     }
+  ],
+  "gallery_events": [
+    {
+      "title": "Educational Support Programme",
+      "slug": "educational-support-programme",
+      "description": "Empowering underprivileged rural children with notebooks, comprehensive school kits, backpacks, and classroom educational resources across Guntur schools.",
+      "eventDate": "2026-11-12",
+      "location": "Amaravathi & Guntur, Andhra Pradesh",
+      "category": "education",
+      "coverImage": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/educational-support-programme/img_01_1794693443528.jpg",
+      "coverImageKey": "gallery/educational-support-programme/img_01_1794693443528.jpg",
+      "isPublished": true,
+      "images": [
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/educational-support-programme/img_01_1794693443528.jpg",
+          "r2ObjectKey": "gallery/educational-support-programme/img_01_1794693443528.jpg",
+          "altText": "Children Home Support & Educational Materials Distribution",
+          "caption": "Children Home Support & Educational Materials Distribution",
+          "displayOrder": 1
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/educational-support-programme/img_02_1794693444024.jpg",
+          "r2ObjectKey": "gallery/educational-support-programme/img_02_1794693444024.jpg",
+          "altText": "Notebooks & School Supplies Distribution for Rural Students",
+          "caption": "Notebooks & School Supplies Distribution for Rural Students",
+          "displayOrder": 2
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/educational-support-programme/img_03_1794693444386.jpg",
+          "r2ObjectKey": "gallery/educational-support-programme/img_03_1794693444386.jpg",
+          "altText": "Primary School Classroom Resources & Educational Kit Drive",
+          "caption": "Primary School Classroom Resources & Educational Kit Drive",
+          "displayOrder": 3
+        }
+      ],
+      "createdAt": "2026-11-14T21:57:24.723Z",
+      "updatedAt": "2026-11-14T21:57:24.723Z",
+      "_id": "ev_1794693444723_lgtc",
+      "id": "ev_1794693444723_lgtc"
+    },
+    {
+      "title": "Community Food & Hunger Relief Drive",
+      "slug": "community-food-hunger-relief-drive",
+      "description": "Daily fresh hot meals, dry grocery ration kits, and essential emergency nutrition boxes distributed to underprivileged and vulnerable families.",
+      "eventDate": "2026-11-10",
+      "location": "Palnadu & Guntur, Andhra Pradesh",
+      "category": "food",
+      "coverImage": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-food---hunger-relief-drive/img_01_1794693444732.jpg",
+      "coverImageKey": "gallery/community-food---hunger-relief-drive/img_01_1794693444732.jpg",
+      "isPublished": true,
+      "images": [
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-food---hunger-relief-drive/img_01_1794693444732.jpg",
+          "r2ObjectKey": "gallery/community-food---hunger-relief-drive/img_01_1794693444732.jpg",
+          "altText": "Daily Hot Food Distribution for Underprivileged Families",
+          "caption": "Daily Hot Food Distribution for Underprivileged Families",
+          "displayOrder": 1
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-food---hunger-relief-drive/img_02_1794693445111.jpg",
+          "r2ObjectKey": "gallery/community-food---hunger-relief-drive/img_02_1794693445111.jpg",
+          "altText": "Nutritious Meal Serving Program for Children & Elders",
+          "caption": "Nutritious Meal Serving Program for Children & Elders",
+          "displayOrder": 2
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-food---hunger-relief-drive/img_03_1794693445514.jpg",
+          "r2ObjectKey": "gallery/community-food---hunger-relief-drive/img_03_1794693445514.jpg",
+          "altText": "Community Kitchen Meal Preparation for Needy Families",
+          "caption": "Community Kitchen Meal Preparation for Needy Families",
+          "displayOrder": 3
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-food---hunger-relief-drive/img_04_1794693445854.jpg",
+          "r2ObjectKey": "gallery/community-food---hunger-relief-drive/img_04_1794693445854.jpg",
+          "altText": "Ration Kits & Grocery Collection Drive for Needy Families",
+          "caption": "Ration Kits & Grocery Collection Drive for Needy Families",
+          "displayOrder": 4
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-food---hunger-relief-drive/img_05_1794693446256.png",
+          "r2ObjectKey": "gallery/community-food---hunger-relief-drive/img_05_1794693446256.png",
+          "altText": "Food & Essential Supplies Box Packing by Volunteers",
+          "caption": "Food & Essential Supplies Box Packing by Volunteers",
+          "displayOrder": 5
+        }
+      ],
+      "createdAt": "2026-11-14T21:57:26.578Z",
+      "updatedAt": "2026-11-14T21:57:26.578Z",
+      "_id": "ev_1794693446578_lmz6",
+      "id": "ev_1794693446578_lmz6"
+    },
+    {
+      "title": "Free Health & Medical Checkup Camps",
+      "slug": "free-health-medical-checkup-camps",
+      "description": "Comprehensive rural health diagnostic camps offering free vital checks, doctor consultations, and free essential medicines to village residents.",
+      "eventDate": "2026-11-05",
+      "location": "Amaravathi Mandal, Andhra Pradesh",
+      "category": "medical",
+      "coverImage": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/free-health---medical-checkup-camps/img_01_1794693446583.jpg",
+      "coverImageKey": "gallery/free-health---medical-checkup-camps/img_01_1794693446583.jpg",
+      "isPublished": true,
+      "images": [
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/free-health---medical-checkup-camps/img_01_1794693446583.jpg",
+          "r2ObjectKey": "gallery/free-health---medical-checkup-camps/img_01_1794693446583.jpg",
+          "altText": "Free Health Checkup and Medicine Support Diagnostics Camp",
+          "caption": "Free Health Checkup and Medicine Support Diagnostics Camp",
+          "displayOrder": 1
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/free-health---medical-checkup-camps/img_02_1794693446916.jpg",
+          "r2ObjectKey": "gallery/free-health---medical-checkup-camps/img_02_1794693446916.jpg",
+          "altText": "Free Essential Medicines & Healthcare Diagnostics Drive",
+          "caption": "Free Essential Medicines & Healthcare Diagnostics Drive",
+          "displayOrder": 2
+        }
+      ],
+      "createdAt": "2026-11-14T21:57:27.377Z",
+      "updatedAt": "2026-11-14T21:57:27.377Z",
+      "_id": "ev_1794693447377_n62k",
+      "id": "ev_1794693447377_n62k"
+    },
+    {
+      "title": "Community Welfare & Volunteer Outreach",
+      "slug": "community-welfare-volunteer-outreach",
+      "description": "Kiran Charitable Trust volunteer coordination, elderly care home rations distribution, women self-reliance skill workshops, and disaster relief.",
+      "eventDate": "2026-10-28",
+      "location": "Guntur & Palnadu Districts, Andhra Pradesh",
+      "category": "events",
+      "coverImage": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-welfare---volunteer-outreach/img_01_1794693447384.png",
+      "coverImageKey": "gallery/community-welfare---volunteer-outreach/img_01_1794693447384.png",
+      "isPublished": true,
+      "images": [
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-welfare---volunteer-outreach/img_01_1794693447384.png",
+          "r2ObjectKey": "gallery/community-welfare---volunteer-outreach/img_01_1794693447384.png",
+          "altText": "Kiran Trust Field Volunteers Gathering & Community Drive",
+          "caption": "Kiran Trust Field Volunteers Gathering & Community Drive",
+          "displayOrder": 1
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-welfare---volunteer-outreach/img_02_1794693447812.avif",
+          "r2ObjectKey": "gallery/community-welfare---volunteer-outreach/img_02_1794693447812.avif",
+          "altText": "Elderly Support Visit & Care Home Rations Distribution",
+          "caption": "Elderly Support Visit & Care Home Rations Distribution",
+          "displayOrder": 2
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-welfare---volunteer-outreach/img_03_1794693448126.jpg",
+          "r2ObjectKey": "gallery/community-welfare---volunteer-outreach/img_03_1794693448126.jpg",
+          "altText": "Women Self-Reliance & Skill Development Workshop",
+          "caption": "Women Self-Reliance & Skill Development Workshop",
+          "displayOrder": 3
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-welfare---volunteer-outreach/img_04_1794693448427.webp",
+          "r2ObjectKey": "gallery/community-welfare---volunteer-outreach/img_04_1794693448427.webp",
+          "altText": "On-Ground Volunteer Outreach & Community Assistance",
+          "caption": "On-Ground Volunteer Outreach & Community Assistance",
+          "displayOrder": 4
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-welfare---volunteer-outreach/img_05_1794693448763.jpg",
+          "r2ObjectKey": "gallery/community-welfare---volunteer-outreach/img_05_1794693448763.jpg",
+          "altText": "Emergency Community Relief & Helping Hands Initiative",
+          "caption": "Emergency Community Relief & Helping Hands Initiative",
+          "displayOrder": 5
+        },
+        {
+          "imageUrl": "https://pub-970bc89c732845808ebd2b74e9d1e0fd.r2.dev/gallery/community-welfare---volunteer-outreach/img_06_1794693449100.webp",
+          "r2ObjectKey": "gallery/community-welfare---volunteer-outreach/img_06_1794693449100.webp",
+          "altText": "Rural Community Aid & Grassroots Support Project",
+          "caption": "Rural Community Aid & Grassroots Support Project",
+          "displayOrder": 6
+        }
+      ],
+      "createdAt": "2026-11-14T21:57:29.452Z",
+      "updatedAt": "2026-11-14T21:57:29.452Z",
+      "_id": "ev_1794693449452_a5gf",
+      "id": "ev_1794693449452_a5gf"
+    }
   ]
 }

@@ -17,10 +17,11 @@ import {
     FaTrophy, FaCalendarCheck, FaLayerGroup, FaFileInvoiceDollar, FaFlask,
     FaSlidersH, FaFileAlt, FaHistory, FaCopy, FaCrown, FaCheckDouble, FaLink,
     FaEdit, FaEye, FaSort, FaSortUp, FaSortDown, FaUpload, FaHeartbeat, FaPhone, FaWhatsapp,
-    FaCloud, FaMemory
+    FaCloud, FaMemory, FaImages
 } from 'react-icons/fa';
 import KLogo from '../assets/Klogo.jpeg';
 import { numberToWordsIndian } from '../utils/numberToWords';
+import AdminGalleryTab from './admin/AdminGalleryTab';
 import '../components/Header.css';
 import './Admin.css';
 
@@ -1573,6 +1574,18 @@ export default function Admin() {
                             <div className="admin-sidebar-item-left">
                                 <FaUsers className="admin-sidebar-icon" />
                                 {!sidebarCollapsed && <span>Users &amp; Roles</span>}
+                            </div>
+                        </button>
+
+                        {/* Gallery Management */}
+                        <button
+                            type="button"
+                            className={`admin-sidebar-item ${activeTab === 'gallery' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('gallery')}
+                        >
+                            <div className="admin-sidebar-item-left">
+                                <FaImages className="admin-sidebar-icon" style={{ color: '#2563eb' }} />
+                                {!sidebarCollapsed && <span>Gallery Management</span>}
                             </div>
                         </button>
 
@@ -4423,6 +4436,13 @@ export default function Admin() {
                             )}
                         </div>
                     </div>
+                )}
+
+                {/* ========================================================
+                    TAB: GALLERY MANAGEMENT (CLOUDFLARE R2 & PUBLIC GALLERY)
+                   ======================================================== */}
+                {activeTab === 'gallery' && (
+                    <AdminGalleryTab getAdminHeaders={getAdminHeaders} />
                 )}
 
                 {/* ========================================================
