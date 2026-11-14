@@ -4,7 +4,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import {
     FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaTag,
-    FaWhatsapp, FaTelegram, FaClock, FaPaperPlane, FaCheckCircle
+    FaWhatsapp, FaClock, FaPaperPlane, FaCheckCircle
 } from 'react-icons/fa'
 import axios from 'axios'
 import { API_BASE_URL } from '../config'
@@ -56,12 +56,6 @@ export default function Contact() {
                                 title: 'WhatsApp',
                                 lines: ['+91 77024 68889'],
                                 link: 'https://wa.me/917702468889',
-                            },
-                            {
-                                icon: <FaTelegram />, color: '#229ED9',
-                                title: 'Telegram',
-                                lines: ['Official Telegram Channel'],
-                                link: 'https://t.me/+od5qPd3bBMY3M2Y9',
                             },
                             {
                                 icon: <FaEnvelope />, color: '#3498DB',
