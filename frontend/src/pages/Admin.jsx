@@ -4514,7 +4514,7 @@ export default function Admin() {
                                 <div style={{ textAlign: 'right' }}>
                                     <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>Node Runtime</div>
                                     <div style={{ fontSize: 16, fontWeight: 800, color: '#0f172a', fontFamily: 'monospace' }}>
-                                        {liveTelemetry?.vmTelemetry?.nodeVersion || process.version || 'v20.x'}
+                                        {liveTelemetry?.vmTelemetry?.nodeVersion || 'v20.x'}
                                     </div>
                                 </div>
                             </div>
