@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FaTimes, FaPlay, FaCamera, FaVideo, FaCalendarAlt, FaStethoscope, FaUtensils, FaGraduationCap, FaTint } from 'react-icons/fa'
+import { FaTimes, FaPlay, FaCamera, FaVideo, FaYoutube, FaCalendarAlt, FaStethoscope, FaUtensils, FaGraduationCap, FaTint } from 'react-icons/fa'
 import './Gallery.css'
 
 // Import actual donation images uploaded by client
@@ -202,7 +202,18 @@ export default function Gallery() {
                     </div>
 
                     {/* Videos Grid */}
-                    <h3 className="gallery-section-title" style={{ marginTop: '60px' }}><FaVideo /> Field Impact Videos</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginTop: '60px', marginBottom: '20px' }}>
+                        <h3 className="gallery-section-title" style={{ margin: 0 }}><FaVideo /> Field Impact Videos</h3>
+                        <a
+                            href="https://www.youtube.com/@KiranCharitableTrust"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn btn-outline"
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 18px', fontSize: '14px', borderColor: '#FF0000', color: 'inherit' }}
+                        >
+                            <FaYoutube style={{ color: '#FF0000', fontSize: '18px' }} /> Watch on YouTube ↗
+                        </a>
+                    </div>
                     <div className="videos-grid">
                         {videos.map((vid, idx) => (
                             <div key={idx} className="video-card">

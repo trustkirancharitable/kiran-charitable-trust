@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { FaXTwitter } from 'react-icons/fa6'
+import { FaXTwitter, FaThreads } from 'react-icons/fa6'
 import {
     FaHeart, FaFacebook, FaInstagram, FaLinkedin,
     FaYoutube, FaWhatsapp, FaTelegram, FaMapMarkerAlt, FaPhone,
@@ -31,10 +31,11 @@ export default function Footer() {
                         <div className="footer-socials">
                             <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebook /></a>
                             <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="X (Twitter)"><FaXTwitter /></a>
-                            <a href="https://instagram.com/kiran_charitabletrust" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                            <a href="https://www.instagram.com/kiran_charitabletrust/" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+                            <a href="https://www.threads.net/@kiran_charitabletrust" target="_blank" rel="noreferrer" aria-label="Threads"><FaThreads /></a>
                             <a href="https://t.me/+od5qPd3bBMY3M2Y9" target="_blank" rel="noreferrer" aria-label="Telegram Channel" style={{ color: '#229ED9' }}><FaTelegram /></a>
                             <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
-                            <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
+                            <a href="https://www.youtube.com/@KiranCharitableTrust" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
                             <a href="https://wa.me/917702468889" target="_blank" rel="noreferrer" aria-label="WhatsApp"><FaWhatsapp /></a>
                         </div>
                     </div>
