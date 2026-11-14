@@ -315,7 +315,8 @@ function loadMemoryStore() {
                 volunteers: parsed.volunteers || [],
                 trust_members: loadedMembers,
                 payments: loadedPayments,
-                monthly_schedules: loadedSchedules
+                monthly_schedules: loadedSchedules,
+                gallery_events: parsed.gallery_events || []
             };
         }
     } catch (e) {
@@ -326,7 +327,8 @@ function loadMemoryStore() {
         volunteers: [],
         trust_members: [...DEFAULT_TRUST_MEMBERS],
         payments: [],
-        monthly_schedules: [...DEFAULT_MONTHLY_SCHEDULES]
+        monthly_schedules: [...DEFAULT_MONTHLY_SCHEDULES],
+        gallery_events: []
     };
 }
 
