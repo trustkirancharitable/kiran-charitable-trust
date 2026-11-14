@@ -93,10 +93,6 @@ export default function Footer() {
                                 <a href="https://wa.me/917702468889" target="_blank" rel="noreferrer">+91 77024 68889</a>
                             </li>
                             <li>
-                                <FaTelegram style={{ color: '#229ED9' }} />
-                                <a href="https://t.me/+od5qPd3bBMY3M2Y9" target="_blank" rel="noreferrer">Telegram: @kirancharitabletrust</a>
-                            </li>
-                            <li>
                                 <FaEnvelope />
                                 <span>contact@kirancharitabletrust.org</span>
                             </li>
