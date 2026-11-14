@@ -59,10 +59,10 @@ router.get(['/events/:id', '/:id'], async (req, res) => {
 // ─── ADMIN ENDPOINTS ─────────────────────────────────────────────────────────
 
 /**
- * GET /admin/events or /admin
+ * GET /admin/events or /events (under /api/admin/gallery)
  * Retrieve all events (published & drafts) for admin dashboard
  */
-router.get(['/admin/events', '/admin'], requireAdmin, async (req, res) => {
+router.get(['/admin/events', '/admin', '/events', '/'], requireAdmin, async (req, res) => {
     try {
         const events = await getAllEvents({ publicOnly: false });
         res.json({
@@ -77,10 +77,10 @@ router.get(['/admin/events', '/admin'], requireAdmin, async (req, res) => {
 });
 
 /**
- * POST /admin/events or /admin
+ * POST /admin/events or /events
  * Create new event gallery with optional cover image and multiple images
  */
-router.post(['/admin/events', '/admin'], requireAdmin, upload.fields([
+router.post(['/admin/events', '/admin', '/events', '/'], requireAdmin, upload.fields([
     { name: 'coverImage', maxCount: 1 },
     { name: 'images', maxCount: 30 }
 ]), async (req, res) => {
@@ -152,10 +152,10 @@ router.post(['/admin/events', '/admin'], requireAdmin, upload.fields([
 });
 
 /**
- * PUT /admin/events/:id
+ * PUT /admin/events/:id or /events/:id
  * Update event metadata
  */
-router.put(['/admin/events/:id', '/admin/:id'], requireAdmin, upload.single('coverImage'), async (req, res) => {
+router.put(['/admin/events/:id', '/admin/:id', '/events/:id', '/:id'], requireAdmin, upload.single('coverImage'), async (req, res) => {
     try {
         const { title, description, eventDate, location, category, isPublished } = req.body;
         const updates = {};
@@ -189,10 +189,10 @@ router.put(['/admin/events/:id', '/admin/:id'], requireAdmin, upload.single('cov
 });
 
 /**
- * DELETE /admin/events/:id
+ * DELETE /admin/events/:id or /events/:id
  * Delete entire event gallery and all its images from R2 and database
  */
-router.delete(['/admin/events/:id', '/admin/:id'], requireAdmin, async (req, res) => {
+router.delete(['/admin/events/:id', '/admin/:id', '/events/:id', '/:id'], requireAdmin, async (req, res) => {
     try {
         const result = await deleteEvent(req.params.id);
         res.json(result);
@@ -203,10 +203,10 @@ router.delete(['/admin/events/:id', '/admin/:id'], requireAdmin, async (req, res
 });
 
 /**
- * POST /admin/events/:id/images
+ * POST /admin/events/:id/images or /events/:id/images
  * Upload multiple images to an existing event
  */
-router.post(['/admin/events/:id/images', '/admin/:id/images'], requireAdmin, upload.array('images', 30), async (req, res) => {
+router.post(['/admin/events/:id/images', '/admin/:id/images', '/events/:id/images', '/:id/images'], requireAdmin, upload.array('images', 30), async (req, res) => {
     try {
         const event = await getEventByIdOrSlug(req.params.id);
         if (!event) {
@@ -245,10 +245,10 @@ router.post(['/admin/events/:id/images', '/admin/:id/images'], requireAdmin, upl
 });
 
 /**
- * DELETE /admin/events/:eventId/images/:imageId
+ * DELETE /admin/events/:eventId/images/:imageId or /events/:eventId/images/:imageId
  * Remove single image from event and R2
  */
-router.delete(['/admin/events/:eventId/images/:imageId', '/admin/:eventId/images/:imageId'], requireAdmin, async (req, res) => {
+router.delete(['/admin/events/:eventId/images/:imageId', '/admin/:eventId/images/:imageId', '/events/:eventId/images/:imageId', '/:eventId/images/:imageId'], requireAdmin, async (req, res) => {
     try {
         const updatedEvent = await removeImageFromEvent(req.params.eventId, req.params.imageId);
         res.json({
@@ -263,10 +263,10 @@ router.delete(['/admin/events/:eventId/images/:imageId', '/admin/:eventId/images
 });
 
 /**
- * PUT /admin/events/:eventId/images/:imageId
+ * PUT /admin/events/:eventId/images/:imageId or /events/:eventId/images/:imageId
  * Replace an image or update caption/alt text
  */
-router.put(['/admin/events/:eventId/images/:imageId', '/admin/:eventId/images/:imageId'], requireAdmin, upload.single('image'), async (req, res) => {
+router.put(['/admin/events/:eventId/images/:imageId', '/admin/:eventId/images/:imageId', '/events/:eventId/images/:imageId', '/:eventId/images/:imageId'], requireAdmin, upload.single('image'), async (req, res) => {
     try {
         const { eventId, imageId } = req.params;
         const { caption, altText } = req.body;
@@ -297,10 +297,10 @@ router.put(['/admin/events/:eventId/images/:imageId', '/admin/:eventId/images/:i
 });
 
 /**
- * PATCH /admin/events/:eventId/reorder
+ * PATCH /admin/events/:eventId/reorder or /events/:eventId/reorder
  * Reorder images in an event
  */
-router.patch(['/admin/events/:eventId/reorder', '/admin/:eventId/reorder'], requireAdmin, async (req, res) => {
+router.patch(['/admin/events/:eventId/reorder', '/admin/:eventId/reorder', '/events/:eventId/reorder', '/:eventId/reorder'], requireAdmin, async (req, res) => {
     try {
         const { orderedImageIds } = req.body;
         if (!Array.isArray(orderedImageIds)) {
@@ -319,10 +319,10 @@ router.patch(['/admin/events/:eventId/reorder', '/admin/:eventId/reorder'], requ
 });
 
 /**
- * PATCH /admin/events/:eventId/publish
+ * PATCH /admin/events/:eventId/publish or /events/:eventId/publish
  * Toggle publish/unpublish status
  */
-router.patch(['/admin/events/:eventId/publish', '/admin/:eventId/publish'], requireAdmin, async (req, res) => {
+router.patch(['/admin/events/:eventId/publish', '/admin/:eventId/publish', '/events/:eventId/publish', '/:eventId/publish'], requireAdmin, async (req, res) => {
     try {
         const event = await getEventByIdOrSlug(req.params.eventId);
         if (!event) return res.status(404).json({ success: false, message: 'Event not found' });
