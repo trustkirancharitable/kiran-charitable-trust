@@ -47,23 +47,30 @@
     padding-top: 18px;
 }
 
-/* Brand Link */
+/* Brand Link & Header Row */
+.admin-sidebar-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 10px;
+}
+
 .admin-sidebar-brand {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 18px 20px;
     text-decoration: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 14px;
+    flex: 1;
 }
 
 .admin-sidebar-logo {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border-radius: 8px;
     object-fit: cover;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
 }
 
 .admin-sidebar-brand-text {
@@ -72,7 +79,7 @@
 }
 
 .admin-brand-main {
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 800;
     color: #ffffff;
     letter-spacing: -0.3px;
@@ -86,12 +93,46 @@
     margin-top: 2px;
 }
 
+.admin-sidebar-collapse-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.admin-sidebar-collapse-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Category Section Titles */
+.admin-sidebar-section-title {
+    padding: 14px 14px 5px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.9px;
+    color: #475569;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
 /* Navigation Items */
 .admin-sidebar-menu {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    padding: 0 8px;
+    gap: 2px;
+    padding: 0 10px;
 }
 
 .admin-sidebar-item {
@@ -102,18 +143,19 @@
     background: transparent !important;
     border: none !important;
     outline: none !important;
-    padding: 11px 14px;
-    border-radius: 8px;
+    padding: 9.5px 14px;
+    border-radius: 9px;
     color: #94a3b8 !important;
     font-size: 13.5px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.18s ease;
     text-decoration: none;
     user-select: none;
     box-sizing: border-box;
     font-family: inherit;
     text-align: left;
+    margin-bottom: 1px;
 }
 
 .admin-sidebar-item:hover {
@@ -124,15 +166,83 @@
 .admin-sidebar-item.active {
     background: linear-gradient(135deg, #0F52BA 0%, #2563EB 100%) !important; /* Kiran Brand Royal Blue */
     color: #ffffff !important;
-    font-weight: 700;
+    font-weight: 600;
     box-shadow: 0 4px 14px rgba(15, 82, 186, 0.4) !important;
     border: none !important;
 }
 
-.admin-sidebar-item.active .admin-sidebar-icon,
-.admin-sidebar-item.active .admin-sidebar-chevron,
-.admin-sidebar-item.active .admin-menu-arrow {
+.admin-sidebar-item.active .admin-sidebar-icon {
     color: #ffffff !important;
+}
+
+/* Individual Icon Accent Colors (inactive state) */
+.icon-dashboard { color: #38bdf8; }
+.icon-donations { color: #60a5fa; }
+.icon-schedules { color: #a78bfa; }
+.icon-members { color: #f59e0b; }
+.icon-volunteers { color: #34d399; }
+.icon-users { color: #818cf8; }
+.icon-gallery { color: #38bdf8; }
+.icon-diagnostics { color: #94a3b8; }
+.icon-contact { color: #fb923c; }
+.icon-heartbeat { color: #10b981; }
+.icon-reports { color: #818cf8; }
+.icon-settings { color: #94a3b8; }
+
+.admin-sidebar-count-badge {
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.admin-sidebar-pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    display: inline-block;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+}
+
+/* Logout pill at bottom of sidebar matching wireframe */
+.admin-sidebar-logout-pill {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(239, 68, 68, 0.08) !important;
+    border: 1px solid rgba(239, 68, 68, 0.28) !important;
+    color: #f87171 !important;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+.admin-sidebar-logout-pill:hover {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border-color: rgba(239, 68, 68, 0.55) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px);
+}
+
+.admin-sidebar-logout-icon {
+    font-size: 15px;
+    color: #f87171;
+    transition: color 0.2s ease;
+}
+
+.admin-sidebar-logout-pill:hover .admin-sidebar-logout-icon {
+    color: #ffffff;
 }
 
 .admin-sidebar-item-left {
