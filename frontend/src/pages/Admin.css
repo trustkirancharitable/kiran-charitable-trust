@@ -3217,3 +3217,551 @@ input.admin-topbar-search-input {
         height: 40px !important;
     }
 }
+
+/* ==========================================================================
+   3-Dots Action Dropdown Menu in Payments Table
+   ========================================================================== */
+.admin-dots-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.admin-dots-action-btn:hover,
+.admin-dots-action-btn:focus {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #cbd5e1;
+}
+
+.payment-action-dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 6px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    min-width: 210px;
+    padding: 6px;
+    z-index: 9999;
+    text-align: left;
+    animation: fadeInMenu 0.15s ease-out;
+}
+
+.payment-action-dropdown-menu.open-upward {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+@keyframes fadeInMenu {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.payment-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #1e293b;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.payment-menu-item:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.payment-menu-item:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.payment-menu-divider {
+    height: 1px;
+    background: #f1f5f9;
+    margin: 6px 4px;
+}
+
+.payment-menu-header {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #94a3b8;
+    padding: 4px 12px 6px;
+    letter-spacing: 0.5px;
+}
+
+.payment-menu-status-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 0 6px 4px;
+}
+
+.payment-status-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 6px 4px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.payment-status-btn:hover {
+    border-color: #cbd5e1;
+    background: #ffffff;
+}
+
+.payment-status-btn.active-completed {
+    background: #ecfdf5;
+    color: #15803d;
+    border-color: #86efac;
+    font-weight: 700;
+}
+
+.payment-status-btn.active-pending {
+    background: #fefce8;
+    color: #a16207;
+    border-color: #fde047;
+    font-weight: 700;
+}
+
+.payment-status-btn.active-failed {
+    background: #fef2f2;
+    color: #b91c1c;
+    border-color: #fca5a5;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   Dark Executive Analytics Suite (Matching user reference)
+   ========================================================================== */
+.admin-dark-analytics-suite {
+    background: #0b132b;
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    color: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dark-analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.dark-analytics-breadcrumb {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+
+.dark-analytics-breadcrumb strong {
+    color: #f8fafc;
+}
+
+.dark-analytics-date {
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.dark-analytics-welcome {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+}
+
+.dark-analytics-summary {
+    font-size: 13.5px;
+    color: #94a3b8;
+    margin: 0;
+    max-width: 650px;
+    line-height: 1.5;
+}
+
+.dark-analytics-summary .highlight-green {
+    color: #10b981;
+    font-weight: 700;
+}
+
+.dark-analytics-summary .highlight-blue {
+    color: #38bdf8;
+    font-weight: 700;
+}
+
+.dark-analytics-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.dark-btn-outline {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #334155;
+    color: #f8fafc;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.dark-btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #64748b;
+}
+
+.dark-btn-primary {
+    background: #2563eb;
+    border: 1px solid #3b82f6;
+    color: #ffffff;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.dark-btn-primary:hover {
+    background: #1d4ed8;
+}
+
+/* 4 Dark Cards Grid */
+.dark-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.dark-metric-card {
+    background: #111c3a;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    padding: 18px 20px;
+}
+
+.dark-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.dark-card-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dark-card-icon {
+    font-size: 13px;
+}
+
+.dark-card-icon.icon-green { color: #10b981; }
+.dark-card-icon.icon-red { color: #f87171; }
+.dark-card-icon.icon-purple { color: #c084fc; }
+.dark-card-icon.icon-blue { color: #38bdf8; }
+
+.dark-card-label {
+    font-size: 12.5px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.dark-card-tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.dark-card-tag.tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+.dark-card-tag.tag-red { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+.dark-card-tag.tag-purple { background: rgba(192, 132, 252, 0.15); color: #c084fc; }
+.dark-card-tag.tag-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+
+.dark-card-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+    margin-bottom: 8px;
+}
+
+.dark-card-value .unit {
+    font-size: 20px;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-left: 2px;
+}
+
+.dark-card-sub {
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+.dark-card-sub strong {
+    color: #cbd5e1;
+}
+
+/* Regional Outreach & Gauges Card */
+.dark-analytics-middle-card {
+    background: #111c3a;
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 22px;
+}
+
+.dark-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.dark-section-sub {
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    color: #64748b;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.dark-section-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+}
+
+.dark-link-btn {
+    background: none;
+    border: none;
+    color: #38bdf8;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.dark-link-btn:hover {
+    color: #7dd3fc;
+}
+
+.dark-geo-bars-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 24px;
+}
+
+.dark-geo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dark-geo-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+}
+
+.dark-geo-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.dark-geo-name .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.dot-purple { background: #a855f7; }
+.dot-green { background: #10b981; }
+.dot-blue { background: #0ea5e9; }
+.dot-white { background: #f8fafc; }
+
+.dark-geo-stat {
+    color: #64748b;
+    font-size: 11.5px;
+}
+
+.dark-geo-stat strong {
+    color: #f8fafc;
+    font-size: 14px;
+    margin-right: 4px;
+}
+
+.dark-bar-track {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dark-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+
+.fill-purple { background: #a855f7; }
+.fill-green { background: #10b981; }
+.fill-blue { background: #0ea5e9; }
+.fill-white { background: #f8fafc; }
+
+/* Circular Gauges */
+.dark-gauges-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.dark-gauge-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dark-gauge-circle {
+    position: relative;
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+}
+
+.dark-gauge-circle svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.dark-gauge-circle .circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 3.8;
+}
+
+.dark-gauge-circle .circle-val {
+    fill: none;
+    stroke-width: 3.8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.3s ease;
+}
+
+.circle-coral .circle-val { stroke: #f43f5e; }
+.circle-blue .circle-val { stroke: #0ea5e9; }
+.circle-yellow .circle-val { stroke: #eab308; }
+
+.gauge-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.dark-gauge-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.dark-gauge-details strong {
+    font-size: 13.5px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.dark-gauge-details span {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+@media (max-width: 1024px) {
+    .dark-metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dark-geo-bars-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .dark-gauges-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 640px) {
+    .dark-metrics-grid {
+        grid-template-columns: 1fr;
+    }
+    .dark-geo-bars-grid {
+        grid-template-columns: 1fr;
+    }
+}

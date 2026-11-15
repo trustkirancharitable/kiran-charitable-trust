@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
@@ -152,6 +152,124 @@ export default function Admin() {
         }
         setPaymentPage(1);
     };
+
+    // 3-Dots Action Dropdown Menu in Payments Table
+    const [openPaymentMenuId, setOpenPaymentMenuId] = useState(null);
+
+    useEffect(() => {
+        const handleClickOutsideMenu = (e) => {
+            if (!e.target.closest('.payment-action-menu-wrap')) {
+                setOpenPaymentMenuId(null);
+            }
+        };
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') setOpenPaymentMenuId(null);
+        };
+        document.addEventListener('click', handleClickOutsideMenu);
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('click', handleClickOutsideMenu);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, []);
+
+    // Helper for formatting time ago in Recent Activities
+    const formatTimeAgo = (timestamp) => {
+        if (!timestamp) return 'Recently';
+        const diff = Date.now() - timestamp;
+        if (diff < 0) return 'Just now';
+        const seconds = Math.floor(diff / 1000);
+        if (seconds < 60) return 'Just now';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} ${minutes === 1 ? 'min' : 'mins'} ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 7) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+        return new Date(timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+    };
+
+    // Dynamic Recent Activities derived from real system events
+    const recentActivities = useMemo(() => {
+        const list = [];
+
+        // 1. Real Payments / Donations
+        (payments || []).forEach(p => {
+            const time = p.createdAt || p.created_at || p.date;
+            if (!time) return;
+            const donorName = p.fullName || p.full_name || 'Donor';
+            const amount = Number(p.amount) || 0;
+            const purpose = p.purpose || 'Education';
+            const isSuccess = p.status === 'completed' || p.status === 'SUCCESS' || p.status === 'success';
+
+            list.push({
+                id: `pay-${p._id || p.transactionId || Math.random()}`,
+                title: `Donation recorded – ₹${amount.toLocaleString('en-IN')} (${purpose})`,
+                subtitle: `By ${donorName}${isSuccess ? ' • Success' : ''}`,
+                time: new Date(time).getTime(),
+                icon: <FaReceipt />,
+                bg: '#eff6ff',
+                color: '#2563eb'
+            });
+        });
+
+        // 2. Real Trust Members
+        (members || []).forEach(m => {
+            const time = m.createdAt || m.created_at || m.date;
+            if (!time) return;
+            const memberName = m.fullName || m.name || 'Trust Member';
+            const role = m.role || m.membershipType || 'Member';
+
+            list.push({
+                id: `mem-${m._id || m.id || Math.random()}`,
+                title: `Trust member verified – ${memberName}`,
+                subtitle: role,
+                time: new Date(time).getTime(),
+                icon: <FaUserCheck />,
+                bg: '#fef3c7',
+                color: '#d97706'
+            });
+        });
+
+        // 3. Real Registered Users / Donors
+        (usersList || []).forEach(u => {
+            const time = u.createdAt || u.created_at;
+            if (!time) return;
+            const uName = u.name || (u.email ? u.email.split('@')[0] : 'Donor');
+
+            list.push({
+                id: `usr-${u._id || u.id || Math.random()}`,
+                title: `New donor registered – ${uName}`,
+                subtitle: u.email || 'Registered User',
+                time: new Date(time).getTime(),
+                icon: <FaCheck />,
+                bg: '#ecfdf5',
+                color: '#059669'
+            });
+        });
+
+        // 4. Real Volunteers
+        (volunteers || []).forEach(v => {
+            const time = v.createdAt || v.created_at;
+            if (!time) return;
+            const volName = v.fullName || v.name || 'Volunteer';
+
+            list.push({
+                id: `vol-${v._id || v.id || Math.random()}`,
+                title: `New volunteer joined – ${volName}`,
+                subtitle: v.role || 'Volunteer',
+                time: new Date(time).getTime(),
+                icon: <FaHeart />,
+                bg: '#fce7f3',
+                color: '#db2777'
+            });
+        });
+
+        // Sort descending (latest activity first)
+        list.sort((a, b) => b.time - a.time);
+
+        return list.slice(0, 5);
+    }, [payments, members, usersList, volunteers]);
 
     // 30-Day Sustaining Pledges & Automated Email Scheduler State
     const [selectedScheduleIds, setSelectedScheduleIds] = useState([]);
@@ -1919,6 +2037,185 @@ export default function Admin() {
                                 </div>
                             </div>
 
+                            {/* Executive Traffic & Digital Reach Analytics Suite (Matching user reference) */}
+                            <div className="admin-dark-analytics-suite">
+                                <div className="dark-analytics-header">
+                                    <div>
+                                        <div className="dark-analytics-breadcrumb">Workspace &rsaquo; <strong>Global Impact &amp; Site Reach Dashboard</strong></div>
+                                        <div className="dark-analytics-date">
+                                            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase()}
+                                        </div>
+                                        <h2 className="dark-analytics-welcome">
+                                            Welcome back, {adminUser?.name || 'Chairman Kiran Babu'}
+                                        </h2>
+                                        <p className="dark-analytics-summary">
+                                            Total donor visits are <span className="highlight-green">+10%</span> week over week, unique supporters steady, and engagement rate holding at <span className="highlight-blue">94%</span>. Live impact reach expanding across Guntur, Amaravathi, and pan-India regions.
+                                        </p>
+                                    </div>
+                                    <div className="dark-analytics-actions">
+                                        <button type="button" className="dark-btn-outline" onClick={handleExportCsv}>
+                                            <FaDownload /> Export
+                                        </button>
+                                        <button type="button" className="dark-btn-primary" onClick={() => setActiveTab('developer')}>
+                                            <FaPlus /> New report
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* 4 Primary Dark Metric Cards */}
+                                <div className="dark-metrics-grid">
+                                    <div className="dark-metric-card">
+                                        <div className="dark-card-top">
+                                            <div className="dark-card-label-wrap">
+                                                <span className="dark-card-icon icon-green"><FaEye /></span>
+                                                <span className="dark-card-label">Total visits</span>
+                                            </div>
+                                            <span className="dark-card-tag tag-green">↗ +10%</span>
+                                        </div>
+                                        <div className="dark-card-value">1.24<span className="unit">M</span></div>
+                                        <div className="dark-card-sub">↗ up from <strong>1.12M</strong> last week</div>
+                                    </div>
+
+                                    <div className="dark-metric-card">
+                                        <div className="dark-card-top">
+                                            <div className="dark-card-label-wrap">
+                                                <span className="dark-card-icon icon-red"><FaFileAlt /></span>
+                                                <span className="dark-card-label">Page views</span>
+                                            </div>
+                                            <span className="dark-card-tag tag-red">↘ -7%</span>
+                                        </div>
+                                        <div className="dark-card-value">4.08<span className="unit">M</span></div>
+                                        <div className="dark-card-sub">↘ down from <strong>4.39M</strong> last week</div>
+                                    </div>
+
+                                    <div className="dark-metric-card">
+                                        <div className="dark-card-top">
+                                            <div className="dark-card-label-wrap">
+                                                <span className="dark-card-icon icon-purple"><FaUsers /></span>
+                                                <span className="dark-card-label">Unique visitors</span>
+                                            </div>
+                                            <span className="dark-card-tag tag-purple">- ~12%</span>
+                                        </div>
+                                        <div className="dark-card-value">842<span className="unit">K</span></div>
+                                        <div className="dark-card-sub">- holding around <strong>835K</strong> last week</div>
+                                    </div>
+
+                                    <div className="dark-metric-card">
+                                        <div className="dark-card-top">
+                                            <div className="dark-card-label-wrap">
+                                                <span className="dark-card-icon icon-blue"><FaChartLine /></span>
+                                                <span className="dark-card-label">Bounce rate</span>
+                                            </div>
+                                            <span className="dark-card-tag tag-blue">- steady</span>
+                                        </div>
+                                        <div className="dark-card-value">33<span className="unit">%</span></div>
+                                        <div className="dark-card-sub">- matching <strong>33%</strong> last week</div>
+                                    </div>
+                                </div>
+
+                                {/* Regional Outreach & Circular Gauges Section */}
+                                <div className="dark-analytics-middle-card">
+                                    <div className="dark-geo-section">
+                                        <div className="dark-section-header">
+                                            <div>
+                                                <span className="dark-section-sub">GEOGRAPHY</span>
+                                                <h4 className="dark-section-title">Site visits</h4>
+                                            </div>
+                                            <button type="button" className="dark-link-btn" onClick={() => setActiveTab('payments')}>
+                                                View report &rarr;
+                                            </button>
+                                        </div>
+
+                                        <div className="dark-geo-bars-grid">
+                                            <div className="dark-geo-item">
+                                                <div className="dark-geo-meta">
+                                                    <span className="dark-geo-name"><span className="dot dot-purple" /> United States</span>
+                                                    <span className="dark-geo-stat"><strong>100K</strong> 50%</span>
+                                                </div>
+                                                <div className="dark-bar-track">
+                                                    <div className="dark-bar-fill fill-purple" style={{ width: '50%' }} />
+                                                </div>
+                                            </div>
+
+                                            <div className="dark-geo-item">
+                                                <div className="dark-geo-meta">
+                                                    <span className="dark-geo-name"><span className="dot dot-green" /> Europe</span>
+                                                    <span className="dark-geo-stat"><strong>1M</strong> 80%</span>
+                                                </div>
+                                                <div className="dark-bar-track">
+                                                    <div className="dark-bar-fill fill-green" style={{ width: '80%' }} />
+                                                </div>
+                                            </div>
+
+                                            <div className="dark-geo-item">
+                                                <div className="dark-geo-meta">
+                                                    <span className="dark-geo-name"><span className="dot dot-blue" /> Australia</span>
+                                                    <span className="dark-geo-stat"><strong>450K</strong> 40%</span>
+                                                </div>
+                                                <div className="dark-bar-track">
+                                                    <div className="dark-bar-fill fill-blue" style={{ width: '40%' }} />
+                                                </div>
+                                            </div>
+
+                                            <div className="dark-geo-item">
+                                                <div className="dark-geo-meta">
+                                                    <span className="dark-geo-name"><span className="dot dot-white" /> India</span>
+                                                    <span className="dark-geo-stat"><strong>1B</strong> 90%</span>
+                                                </div>
+                                                <div className="dark-bar-track">
+                                                    <div className="dark-bar-fill fill-white" style={{ width: '90%' }} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Circular Gauges Row */}
+                                        <div className="dark-gauges-row">
+                                            <div className="dark-gauge-item">
+                                                <div className="dark-gauge-circle circle-coral">
+                                                    <svg viewBox="0 0 36 36">
+                                                        <path className="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                        <path className="circle-val" strokeDasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                    </svg>
+                                                    <span className="gauge-number">75%</span>
+                                                </div>
+                                                <div className="dark-gauge-details">
+                                                    <strong>New users</strong>
+                                                    <span>first-time visitors</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="dark-gauge-item">
+                                                <div className="dark-gauge-circle circle-blue">
+                                                    <svg viewBox="0 0 36 36">
+                                                        <path className="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                        <path className="circle-val" strokeDasharray="50, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                    </svg>
+                                                    <span className="gauge-number">50%</span>
+                                                </div>
+                                                <div className="dark-gauge-details">
+                                                    <strong>New purchases</strong>
+                                                    <span>from new visits</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="dark-gauge-item">
+                                                <div className="dark-gauge-circle circle-yellow">
+                                                    <svg viewBox="0 0 36 36">
+                                                        <path className="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                        <path className="circle-val" strokeDasharray="90, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                                    </svg>
+                                                    <span className="gauge-number">90%</span>
+                                                </div>
+                                                <div className="dark-gauge-details">
+                                                    <strong>Bounce rate</strong>
+                                                    <span>avg engagement</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Target Registration Velocity Tracking Dark Navy Box */}
                             <div className="admin-velocity-banner">
                                 <div className="admin-velocity-header">
@@ -2111,27 +2408,55 @@ export default function Admin() {
                                         </button>
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 12.5 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}><FaCheck /></span>
-                                                <strong style={{ color: '#0f172a' }}>New donor registered – Ravi Teja</strong>
+                                        {recentActivities.length === 0 ? (
+                                            <div style={{ color: '#94a3b8', padding: '16px 0', textAlign: 'center' }}>
+                                                No recent system activities recorded yet.
                                             </div>
-                                            <span style={{ color: '#94a3b8', fontSize: 11.5 }}>2 hours ago</span>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid #f1f5f9' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}><FaReceipt /></span>
-                                                <strong style={{ color: '#0f172a' }}>Donation recorded – ₹25,000 (Education)</strong>
-                                            </div>
-                                            <span style={{ color: '#94a3b8', fontSize: 11.5 }}>4 hours ago</span>
-                                        </div>
-                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '6px 0' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}><FaUserCheck /></span>
-                                                <strong style={{ color: '#0f172a' }}>Trust member verified – Lakshmi Devi</strong>
-                                            </div>
-                                            <span style={{ color: '#94a3b8', fontSize: 11.5 }}>6 hours ago</span>
-                                        </div>
+                                        ) : (
+                                            recentActivities.map((act) => (
+                                                <div
+                                                    key={act.id}
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'space-between',
+                                                        padding: '7px 0',
+                                                        borderBottom: '1px solid #f1f5f9',
+                                                        gap: 12
+                                                    }}
+                                                >
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                                                        <span
+                                                            style={{
+                                                                width: 24,
+                                                                height: 24,
+                                                                borderRadius: '50%',
+                                                                background: act.bg,
+                                                                color: act.color,
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center',
+                                                                fontSize: 11,
+                                                                flexShrink: 0
+                                                            }}
+                                                        >
+                                                            {act.icon}
+                                                        </span>
+                                                        <div style={{ minWidth: 0 }}>
+                                                            <strong style={{ color: '#0f172a', display: 'block', fontSize: 12.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                                {act.title}
+                                                            </strong>
+                                                            {act.subtitle && (
+                                                                <span style={{ color: '#64748b', fontSize: 11 }}>{act.subtitle}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <span style={{ color: '#94a3b8', fontSize: 11.5, flexShrink: 0, whiteSpace: 'nowrap' }}>
+                                                        {formatTimeAgo(act.time)}
+                                                    </span>
+                                                </div>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
 
@@ -2320,7 +2645,7 @@ export default function Admin() {
                         </div>
 
                         {/* 4. Table */}
-                        <div className="admin-table-wrapper" style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                        <div className="admin-table-wrapper" style={{ background: '#ffffff', borderRadius: 12, border: '1px solid #e2e8f0', overflowX: 'auto', overflowY: 'visible', minHeight: 460 }}>
                             <table className="admin-data-table">
                                 <thead>
                                     <tr>
@@ -2522,7 +2847,7 @@ export default function Admin() {
                                                 <option value="year">FY 2026-27</option>
                                             </select>
                                         </th>
-                                        <th style={{ textAlign: 'center', verticalAlign: 'top' }}>ACTIONS</th>
+                                        <th style={{ textAlign: 'center', verticalAlign: 'top', width: 90 }}>ACTIONS</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -2685,56 +3010,128 @@ export default function Admin() {
                                                             {new Date(p.createdAt || p.created_at || p.date || Date.now()).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                                                         </div>
                                                     </td>
-                                                    <td>
-                                                        <div style={{ display: 'flex', gap: 6, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <td style={{ textAlign: 'center', width: 90, position: 'relative' }}>
+                                                        <div className="payment-action-menu-wrap" style={{ position: 'relative', display: 'inline-block' }}>
                                                             <button
-                                                                className="btn-action btn-action-secondary"
-                                                                onClick={() => handleOpenEditDonation(p)}
-                                                                title="Edit Donation Details"
-                                                                style={{ padding: '4px 10px', fontSize: 11.5 }}
+                                                                type="button"
+                                                                className="admin-dots-action-btn"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setOpenPaymentMenuId(openPaymentMenuId === pId ? null : pId);
+                                                                }}
+                                                                title="More Actions &amp; Options"
+                                                                aria-label="More Actions &amp; Options"
                                                             >
-                                                                <FaEdit /> Edit
+                                                                <FaEllipsisV />
                                                             </button>
 
-                                                            <button
-                                                                className="btn-action btn-action-primary"
-                                                                onClick={() => handleResendReceipt(p)}
-                                                                disabled={resendingId === pId}
-                                                                title="Dispatch Official 80G Receipt via Email"
-                                                                style={{ padding: '4px 10px', fontSize: 11.5 }}
-                                                            >
-                                                                <FaReceipt /> {resendingId === pId ? 'Sending...' : 'Receipt'}
-                                                            </button>
+                                                            {openPaymentMenuId === pId && (
+                                                                <div className={`payment-action-dropdown-menu ${idx >= 5 ? 'open-upward' : ''}`}>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="payment-menu-item"
+                                                                        onClick={() => {
+                                                                            setOpenPaymentMenuId(null);
+                                                                            handleOpenEditDonation(p);
+                                                                        }}
+                                                                    >
+                                                                        <FaEdit style={{ color: '#2563eb' }} />
+                                                                        <span>Edit Details</span>
+                                                                    </button>
 
-                                                            <button
-                                                                className="btn-action btn-action-secondary"
-                                                                onClick={() => setSelectedCertDonation(p)}
-                                                                title="View & Print Official CBDT Form 10BE Certificate"
-                                                                style={{ padding: '4px 10px', fontSize: 11.5 }}
-                                                            >
-                                                                <FaFileAlt /> 80G Form
-                                                            </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="payment-menu-item"
+                                                                        onClick={() => {
+                                                                            setOpenPaymentMenuId(null);
+                                                                            handleResendReceipt(p);
+                                                                        }}
+                                                                        disabled={resendingId === pId}
+                                                                    >
+                                                                        <FaReceipt style={{ color: '#059669' }} />
+                                                                        <span>{resendingId === pId ? 'Sending...' : 'Resend Receipt'}</span>
+                                                                    </button>
 
-                                                            <button
-                                                                className="btn-action btn-action-secondary"
-                                                                onClick={() => handleCheckGatewayStatus(p)}
-                                                                disabled={checkingGatewayId === pId}
-                                                                title="Live Gateway Status Enquiry"
-                                                                style={{ padding: '4px 10px', fontSize: 11.5 }}
-                                                            >
-                                                                <FaSyncAlt className={checkingGatewayId === pId ? 'admin-spin' : ''} /> {checkingGatewayId === pId ? 'Checking...' : 'Check Status'}
-                                                            </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="payment-menu-item"
+                                                                        onClick={() => {
+                                                                            setOpenPaymentMenuId(null);
+                                                                            setSelectedCertDonation(p);
+                                                                        }}
+                                                                    >
+                                                                        <FaFileAlt style={{ color: '#7c3aed' }} />
+                                                                        <span>View 80G Form (10BE)</span>
+                                                                    </button>
 
-                                                            <select
-                                                                value={p.status || 'pending'}
-                                                                onChange={e => handleUpdatePaymentStatus(p, e.target.value)}
-                                                                className="admin-select"
-                                                                style={{ padding: '4px 8px', fontSize: 11 }}
-                                                            >
-                                                                <option value="success">Success</option>
-                                                                <option value="pending">Pending</option>
-                                                                <option value="failed">Failed</option>
-                                                            </select>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="payment-menu-item"
+                                                                        onClick={() => {
+                                                                            setOpenPaymentMenuId(null);
+                                                                            handleCheckGatewayStatus(p);
+                                                                        }}
+                                                                        disabled={checkingGatewayId === pId}
+                                                                    >
+                                                                        <FaSyncAlt className={checkingGatewayId === pId ? 'admin-spin' : ''} style={{ color: '#d97706' }} />
+                                                                        <span>{checkingGatewayId === pId ? 'Checking...' : 'Check Gateway'}</span>
+                                                                    </button>
+
+                                                                    <div className="payment-menu-divider" />
+
+                                                                    <div className="payment-menu-header">Update Status</div>
+                                                                    <div className="payment-menu-status-options">
+                                                                        <button
+                                                                            type="button"
+                                                                            className={`payment-status-btn ${isSuccess ? 'active-completed' : ''}`}
+                                                                            onClick={() => {
+                                                                                setOpenPaymentMenuId(null);
+                                                                                handleUpdatePaymentStatus(p, 'completed');
+                                                                            }}
+                                                                        >
+                                                                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16a34a' }} />
+                                                                            Success
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={`payment-status-btn ${isPending ? 'active-pending' : ''}`}
+                                                                            onClick={() => {
+                                                                                setOpenPaymentMenuId(null);
+                                                                                handleUpdatePaymentStatus(p, 'pending');
+                                                                            }}
+                                                                        >
+                                                                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#ca8a04' }} />
+                                                                            Pending
+                                                                        </button>
+                                                                        <button
+                                                                            type="button"
+                                                                            className={`payment-status-btn ${!isSuccess && !isPending ? 'active-failed' : ''}`}
+                                                                            onClick={() => {
+                                                                                setOpenPaymentMenuId(null);
+                                                                                handleUpdatePaymentStatus(p, 'failed');
+                                                                            }}
+                                                                        >
+                                                                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#dc2626' }} />
+                                                                            Failed
+                                                                        </button>
+                                                                    </div>
+
+                                                                    <div className="payment-menu-divider" />
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="payment-menu-item"
+                                                                        onClick={() => {
+                                                                            setOpenPaymentMenuId(null);
+                                                                            navigator.clipboard?.writeText(p.clientTxnId || p.transactionId || '');
+                                                                            toast.success('Txn ID copied');
+                                                                        }}
+                                                                    >
+                                                                        <FaCopy style={{ color: '#64748b' }} />
+                                                                        <span>Copy Txn Ref</span>
+                                                                    </button>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>
