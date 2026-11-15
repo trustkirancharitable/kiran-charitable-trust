@@ -2861,7 +2861,7 @@ export default function Admin() {
                                         filteredPayments.slice((paymentPage - 1) * 10, paymentPage * 10).map((p, idx) => {
                                             const isSuccess = p.status === 'completed' || p.status === 'SUCCESS' || p.status === 'success';
                                             const isPending = p.status === 'pending' || p.status === 'PENDING';
-                                            const pId = p._id || p.transactionId;
+                                            const pId = p._id || p.id || p.clientTxnId || p.client_txn_id || p.transactionId || p.transaction_id || `txn-row-${idx}`;
                                             const initials = (p.fullName || p.full_name || 'Valued Donor')
                                                 .split(' ')
                                                 .map(n => n[0])
@@ -3025,7 +3025,7 @@ export default function Admin() {
                                                                 <FaEllipsisV />
                                                             </button>
 
-                                                            {openPaymentMenuId === pId && (
+                                                            {Boolean(openPaymentMenuId && openPaymentMenuId === pId) && (
                                                                 <div className={`payment-action-dropdown-menu ${idx >= 5 ? 'open-upward' : ''}`}>
                                                                     <button
                                                                         type="button"
