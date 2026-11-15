@@ -296,9 +296,6 @@ export default function PortalLogin() {
   function handleKycSubmit(e) {
     e.preventDefault();
     const rawAadhar = regAadhar.replace(/\s/g, '');
-    if (!profilePhotoFile && !photoPreview) {
-      return setError('Profile photo is mandatory. Please upload a clear photo.');
-    }
     if (rawAadhar.length !== 12) {
       return setError('Aadhaar number must be exactly 12 digits.');
     }
@@ -968,10 +965,10 @@ export default function PortalLogin() {
                     </div>
                   </div>
 
-                  {/* Profile Photo (Mandatory) */}
+                  {/* Profile Photo (Optional) */}
                   <div style={{ marginBottom: '1.1rem' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-                      <FaCamera style={{ color: '#2563eb' }} /> Profile Photo <span style={{ color: '#ef4444' }}>* (Mandatory)</span>
+                      <FaCamera style={{ color: '#2563eb' }} /> Profile Photo <span style={{ color: '#64748b', fontWeight: 500 }}>(Optional)</span>
                     </label>
                     <div
                       onClick={() => fileInputRef.current?.click()}
@@ -1008,7 +1005,7 @@ export default function PortalLogin() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 700, fontSize: '0.85rem', color: photoPreview ? '#059669' : '#1e293b' }}>
-                          {photoPreview ? 'Profile Photo Attached ✓' : 'Click to Upload Member Photo *'}
+                          {photoPreview ? 'Profile Photo Attached ✓' : 'Click to Upload Member Photo (Optional)'}
                         </div>
                         <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
                           Used for your official Digital Trust Member ID Card (Max 5MB)

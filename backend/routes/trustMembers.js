@@ -45,13 +45,8 @@ router.post('/register', upload.single('profilePhoto'), async (req, res) => {
             });
         }
 
+        // Profile photo is optional during registration
         let profilePhotoUrl = req.body.profilePhotoUrl || req.body.profilePhoto || '';
-        if (!req.file && !profilePhotoUrl) {
-            return res.status(400).json({
-                success: false,
-                message: 'Profile photo is mandatory. Please upload a clear photo.'
-            });
-        }
 
         const cleanAadhar = String(aadharNumber).replace(/\D/g, '');
         if (cleanAadhar.length !== 12) {

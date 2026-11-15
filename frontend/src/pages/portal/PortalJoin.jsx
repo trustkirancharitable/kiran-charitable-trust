@@ -189,9 +189,6 @@ export default function PortalJoin() {
 
   function handleProfileSubmit(e) {
     e.preventDefault();
-    if (!form.profilePhoto && !form.photoPreview) {
-      return setError('Profile photo is required. Please upload a clear photo.');
-    }
     const cleanAadhar = form.aadharNumber.replace(/\D/g, '');
     if (cleanAadhar.length !== 12) return setError('Please enter a valid 12-digit Aadhaar number.');
     if (!form.address.trim()) return setError('Residential address is required.');
@@ -582,10 +579,10 @@ export default function PortalJoin() {
                   Aadhaar verification and official member photo are required for trust registration under Regd. No. 3/2026.
                 </p>
 
-                {/* Profile Photo */}
+                {/* Profile Photo (Optional) */}
                 <div style={{ marginBottom: '1.1rem' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: 6 }}>
-                    <FaCamera style={{ color: '#2563eb' }} /> Profile Photo <span style={{ color: '#ef4444' }}>* (Mandatory)</span>
+                    <FaCamera style={{ color: '#2563eb' }} /> Profile Photo <span style={{ color: '#64748b', fontWeight: 500 }}>(Optional)</span>
                   </label>
                   <div
                     onClick={() => fileRef.current?.click()}
@@ -609,7 +606,7 @@ export default function PortalJoin() {
                     </div>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.86rem', color: form.photoPreview ? '#059669' : '#1e293b' }}>
-                        {form.photoPreview ? 'Profile Photo Attached ✓' : 'Click to Upload Member Photo *'}
+                        {form.photoPreview ? 'Profile Photo Attached ✓' : 'Click to Upload Member Photo (Optional)'}
                       </div>
                       <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
                         Displayed on your official Trust Member ID card and directory

@@ -402,9 +402,6 @@ export default function MainLogin() {
 
     const handleProfileSubmit = (e) => {
         e.preventDefault();
-        if (!form.profilePhoto && !form.photoPreview) {
-            return setErrorMessage('Profile photo is mandatory. Please upload a clear photo (Size: 100 KB – 150 KB) for your Member ID card.');
-        }
         if (form.profilePhoto) {
             const sizeKB = form.profilePhoto.size / 1024;
             if (sizeKB < 100 || sizeKB > 150) {
@@ -1036,9 +1033,9 @@ export default function MainLogin() {
                                         {/* Photo Upload */}
                                         <div className="field-group">
                                             <label className="field-label" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                                                <span><FaCamera style={{ color: '#0F52BA' }} /> Profile Photo * (Mandatory for ID Card)</span>
-                                                <span style={{ fontSize: '0.75rem', color: '#b45309', background: '#fef3c7', padding: '2px 8px', borderRadius: 6, fontWeight: 700, border: '1px solid #fde68a' }}>
-                                                    Size Limit: 100 KB – 150 KB
+                                                <span><FaCamera style={{ color: '#0F52BA' }} /> Profile Photo (Optional)</span>
+                                                <span style={{ fontSize: '0.75rem', color: '#64748b', background: '#f1f5f9', padding: '2px 8px', borderRadius: 6, fontWeight: 600, border: '1px solid #e2e8f0' }}>
+                                                    Optional (100 KB – 150 KB)
                                                 </span>
                                             </label>
                                             <div
@@ -1063,10 +1060,10 @@ export default function MainLogin() {
                                                 </div>
                                                 <div>
                                                     <div style={{ fontWeight: 700, fontSize: '0.88rem', color: form.photoPreview ? '#059669' : '#0f172a' }}>
-                                                        {form.photoPreview ? `Profile Photo Attached ✓ (${form.photoSizeKB || ''} KB)` : 'Click to Upload Member Photo *'}
+                                                        {form.photoPreview ? `Profile Photo Attached ✓ (${form.photoSizeKB || ''} KB)` : 'Click to Upload Member Photo (Optional)'}
                                                     </div>
                                                     <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                                                        Mandatory Size: <strong>100 KB to 150 KB only</strong> (JPG/PNG) • Rendered on your official digital ID card
+                                                        Optional (100 KB to 150 KB) • Rendered on your official digital ID card
                                                     </div>
                                                 </div>
                                             </div>

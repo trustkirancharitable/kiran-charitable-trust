@@ -139,9 +139,6 @@ function RegisterModal({ onClose, initialTier }) {
 
   function submitProfile(e) {
     e.preventDefault();
-    if (!form.profilePhoto) {
-      return setError('Profile photo is mandatory. Please upload a clear photo (Size: 100 KB – 150 KB).');
-    }
     if (form.profilePhoto) {
       const sizeKB = form.profilePhoto.size / 1024;
       if (sizeKB < 100 || sizeKB > 150) {
@@ -314,9 +311,9 @@ function RegisterModal({ onClose, initialTier }) {
           <form onSubmit={submitProfile}>
             <div className="tm-fg">
               <label className="tm-fl" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                <span>Profile Photo <span className="star" style={{ color: '#ef4444' }}>* (Mandatory)</span></span>
-                <span style={{ fontSize: '0.75rem', color: '#b45309', background: '#fef3c7', padding: '2px 8px', borderRadius: 6, fontWeight: 700, border: '1px solid #fde68a' }}>
-                  Size Limit: 100 KB – 150 KB
+                <span>Profile Photo <span className="optional" style={{ color: '#64748b', fontWeight: 500 }}>(Optional)</span></span>
+                <span style={{ fontSize: '0.75rem', color: '#64748b', background: '#f1f5f9', padding: '2px 8px', borderRadius: 6, fontWeight: 600, border: '1px solid #e2e8f0' }}>
+                  Optional (100 KB – 150 KB)
                 </span>
               </label>
               <div className="tm-photo-box" onClick={() => fileRef.current?.click()} style={{ border: form.profilePhoto ? '2px solid #10b981' : '1.5px dashed #cbd5e1' }}>
@@ -325,7 +322,7 @@ function RegisterModal({ onClose, initialTier }) {
                 </div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.9rem', color: form.photoPreview ? '#059669' : 'var(--tm-secondary)' }}>
-                    {form.photoPreview ? `Profile photo selected ✓ (${form.photoSizeKB || ''} KB)` : 'Click to upload your photo * (Required)'}
+                    {form.photoPreview ? `Profile photo selected ✓ (${form.photoSizeKB || ''} KB)` : 'Click to upload your photo (Optional)'}
                   </div>
                   <div style={{ fontSize: '0.78rem', color: 'var(--tm-text-light)' }}>
                     Size specification: <strong>100 KB to 150 KB only</strong> (JPG/PNG) • Displayed on your digital ID card &amp; Member Directory
