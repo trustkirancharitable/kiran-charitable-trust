@@ -563,118 +563,209 @@ export default function AdminGalleryTab({ getAdminHeaders }) {
                     <p>No events match your current search or filter criteria. Click &quot;Create New Event&quot; to get started.</p>
                 </div>
             ) : (
-                <div className="admin-events-table-wrap">
-                    <table className="admin-events-table">
-                        <thead>
-                            <tr>
-                                <th>Cover</th>
-                                <th>Event Details</th>
-                                <th>Category</th>
-                                <th>Date &amp; Location</th>
-                                <th>Photos</th>
-                                <th>Status</th>
-                                <th style={{ textAlign: 'right' }}>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredEvents.map((event) => {
-                                const photoCount = event.images?.length || 0;
-                                const coverImg = event.coverImage || (event.images?.[0]?.imageUrl) || '';
-                                return (
-                                    <tr key={event._id || event.id || event.slug}>
-                                        <td style={{ width: 80 }}>
-                                            <div className="admin-event-cover-thumb">
-                                                {coverImg ? (
-                                                    <img src={coverImg} alt={event.title} />
-                                                ) : (
-                                                    <FaImages />
+                <>
+                    {/* Desktop View: Full Table */}
+                    <div className="admin-events-table-wrap">
+                        <table className="admin-events-table">
+                            <thead>
+                                <tr>
+                                    <th>Cover</th>
+                                    <th>Event Details</th>
+                                    <th>Category</th>
+                                    <th>Date &amp; Location</th>
+                                    <th>Photos</th>
+                                    <th>Status</th>
+                                    <th style={{ textAlign: 'right' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredEvents.map((event) => {
+                                    const photoCount = event.images?.length || 0;
+                                    const coverImg = event.coverImage || (event.images?.[0]?.imageUrl) || '';
+                                    return (
+                                        <tr key={event._id || event.id || event.slug}>
+                                            <td style={{ width: 80 }}>
+                                                <div className="admin-event-cover-thumb">
+                                                    {coverImg ? (
+                                                        <img src={coverImg} alt={event.title} />
+                                                    ) : (
+                                                        <FaImages />
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="admin-event-cell-title">{event.title}</div>
+                                                <div className="admin-event-cell-slug">Slug: {event.slug}</div>
+                                                {event.description && (
+                                                    <div className="admin-event-cell-desc">{event.description}</div>
                                                 )}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="admin-event-cell-title">{event.title}</div>
-                                            <div className="admin-event-cell-slug">Slug: {event.slug}</div>
-                                            {event.description && (
-                                                <div className="admin-event-cell-desc">{event.description}</div>
-                                            )}
-                                        </td>
-                                        <td>
-                                            <span className={`admin-cat-badge cat-${event.category || 'events'}`}>
-                                                {event.category || 'events'}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
-                                                <FaCalendarAlt style={{ marginRight: 5, color: '#64748b' }} />
-                                                {event.eventDate || '—'}
-                                            </div>
-                                            <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
-                                                <FaMapMarkerAlt style={{ marginRight: 4, color: '#ef4444' }} />
-                                                {event.location || '—'}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <button
-                                                type="button"
-                                                className="admin-photo-count-btn"
-                                                onClick={() => setManageEvent(event)}
-                                                title="Manage Photos in this Event"
-                                            >
-                                                <FaCamera /> {photoCount} {photoCount === 1 ? 'Photo' : 'Photos'}
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <button
-                                                type="button"
-                                                className={`admin-status-pill ${event.isPublished ? 'published' : 'draft'}`}
-                                                onClick={() => handleTogglePublish(event)}
-                                                title={`Click to ${event.isPublished ? 'Unpublish' : 'Publish'}`}
-                                            >
-                                                {event.isPublished ? '● Published' : '○ Draft'}
-                                            </button>
-                                        </td>
-                                        <td style={{ textAlign: 'right' }}>
-                                            <div className="admin-table-actions">
+                                            </td>
+                                            <td>
+                                                <span className={`admin-cat-badge cat-${event.category || 'events'}`}>
+                                                    {event.category || 'events'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>
+                                                    <FaCalendarAlt style={{ marginRight: 5, color: '#64748b' }} />
+                                                    {event.eventDate || '—'}
+                                                </div>
+                                                <div style={{ fontSize: 12, color: '#64748b', marginTop: 3 }}>
+                                                    <FaMapMarkerAlt style={{ marginRight: 4, color: '#ef4444' }} />
+                                                    {event.location || '—'}
+                                                </div>
+                                            </td>
+                                            <td>
                                                 <button
                                                     type="button"
-                                                    className="action-icon-btn manage"
+                                                    className="admin-photo-count-btn"
                                                     onClick={() => setManageEvent(event)}
-                                                    title="Manage &amp; Upload Photos"
+                                                    title="Manage Photos in this Event"
                                                 >
-                                                    <FaCamera />
+                                                    <FaCamera /> {photoCount} {photoCount === 1 ? 'Photo' : 'Photos'}
                                                 </button>
+                                            </td>
+                                            <td>
                                                 <button
                                                     type="button"
-                                                    className="action-icon-btn preview"
-                                                    onClick={() => setPreviewSlideshow({ isOpen: true, event, currentIndex: 0, isZoomed: false })}
-                                                    title="Preview Slideshow"
+                                                    className={`admin-status-pill ${event.isPublished ? 'published' : 'draft'}`}
+                                                    onClick={() => handleTogglePublish(event)}
+                                                    title={`Click to ${event.isPublished ? 'Unpublish' : 'Publish'}`}
                                                 >
-                                                    <FaEye />
+                                                    {event.isPublished ? '● Published' : '○ Draft'}
                                                 </button>
+                                            </td>
+                                            <td style={{ textAlign: 'right' }}>
+                                                <div className="admin-table-actions">
+                                                    <button
+                                                        type="button"
+                                                        className="action-icon-btn manage"
+                                                        onClick={() => setManageEvent(event)}
+                                                        title="Manage &amp; Upload Photos"
+                                                    >
+                                                        <FaCamera />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="action-icon-btn preview"
+                                                        onClick={() => setPreviewSlideshow({ isOpen: true, event, currentIndex: 0, isZoomed: false })}
+                                                        title="Preview Slideshow"
+                                                    >
+                                                        <FaEye />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="action-icon-btn edit"
+                                                        onClick={() => handleOpenEdit(event)}
+                                                        title="Edit Event Details"
+                                                    >
+                                                        <FaEdit />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="action-icon-btn delete"
+                                                        onClick={() => handleDeleteEvent(event)}
+                                                        title="Delete Event &amp; Photos"
+                                                    >
+                                                        <FaTrashAlt />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Mobile & Tablet View: Structured Executive Cards */}
+                    <div className="admin-events-cards-mobile">
+                        {filteredEvents.map((event) => {
+                            const photoCount = event.images?.length || 0;
+                            const coverImg = event.coverImage || (event.images?.[0]?.imageUrl) || '';
+                            return (
+                                <div key={event._id || event.id || event.slug} className="admin-mobile-event-card">
+                                    <div className="mobile-card-top-row">
+                                        <div className="mobile-card-cover-box">
+                                            {coverImg ? (
+                                                <img src={coverImg} alt={event.title} />
+                                            ) : (
+                                                <FaImages />
+                                            )}
+                                        </div>
+                                        <div className="mobile-card-header-info">
+                                            <div className="mobile-card-badges-row">
+                                                <span className={`admin-cat-badge cat-${event.category || 'events'}`}>
+                                                    {event.category || 'events'}
+                                                </span>
                                                 <button
                                                     type="button"
-                                                    className="action-icon-btn edit"
-                                                    onClick={() => handleOpenEdit(event)}
-                                                    title="Edit Event Details"
+                                                    className={`admin-status-pill ${event.isPublished ? 'published' : 'draft'}`}
+                                                    onClick={() => handleTogglePublish(event)}
+                                                    title={`Click to ${event.isPublished ? 'Unpublish' : 'Publish'}`}
                                                 >
-                                                    <FaEdit />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="action-icon-btn delete"
-                                                    onClick={() => handleDeleteEvent(event)}
-                                                    title="Delete Event &amp; Photos"
-                                                >
-                                                    <FaTrashAlt />
+                                                    {event.isPublished ? '● Published' : '○ Draft'}
                                                 </button>
                                             </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                            <h3 className="mobile-card-title">{event.title}</h3>
+                                            <div className="mobile-card-slug">Slug: {event.slug}</div>
+                                        </div>
+                                    </div>
+
+                                    {event.description && (
+                                        <p className="mobile-card-desc">{event.description}</p>
+                                    )}
+
+                                    <div className="mobile-card-meta-row">
+                                        <div className="mobile-meta-item">
+                                            <FaCalendarAlt style={{ color: '#64748b' }} />
+                                            <span>{event.eventDate || '—'}</span>
+                                        </div>
+                                        <div className="mobile-meta-item">
+                                            <FaMapMarkerAlt style={{ color: '#ef4444' }} />
+                                            <span>{event.location || '—'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="mobile-card-actions-grid">
+                                        <button
+                                            type="button"
+                                            className="mobile-action-pill manage"
+                                            onClick={() => setManageEvent(event)}
+                                            title="Manage and upload photos"
+                                        >
+                                            <FaCamera /> Photos ({photoCount})
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="mobile-action-pill preview"
+                                            onClick={() => setPreviewSlideshow({ isOpen: true, event, currentIndex: 0, isZoomed: false })}
+                                            title="Preview Slideshow"
+                                        >
+                                            <FaEye /> Preview
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="mobile-action-pill edit"
+                                            onClick={() => handleOpenEdit(event)}
+                                            title="Edit Event"
+                                        >
+                                            <FaEdit /> Edit
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="mobile-action-pill delete"
+                                            onClick={() => handleDeleteEvent(event)}
+                                            title="Delete Event"
+                                        >
+                                            <FaTrashAlt /> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
             )}
 
             {/* ========================================================

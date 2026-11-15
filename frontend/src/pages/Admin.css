@@ -1449,6 +1449,37 @@ input.admin-topbar-search-input {
     .admin-overview-middle-grid { grid-template-columns: 1fr; }
     .admin-overview-bottom-grid { grid-template-columns: 1fr; }
     .admin-diag-bottom-grid { grid-template-columns: 1fr; }
+    .admin-topbar-subtitle { display: none !important; }
+    .admin-topbar-donate-btn { display: none !important; }
+    .admin-search-wrapper { width: 220px !important; }
+}
+
+@media (max-width: 850px) {
+    .admin-topbar {
+        padding: 0 16px !important;
+        height: 60px !important;
+        min-height: 60px !important;
+    }
+    .admin-topbar-title {
+        font-size: 14px !important;
+        white-space: nowrap !important;
+    }
+    .admin-topbar-subtitle {
+        display: none !important;
+    }
+    .admin-search-wrapper {
+        display: none !important;
+    }
+    .admin-topbar-left {
+        gap: 8px !important;
+        flex-shrink: 0 !important;
+    }
+    .admin-topbar-actions {
+        gap: 8px !important;
+    }
+    .admin-content-area {
+        padding: 16px 14px 32px !important;
+    }
 }
 
 @media (max-width: 768px) {
