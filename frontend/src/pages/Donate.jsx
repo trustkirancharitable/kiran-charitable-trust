@@ -367,8 +367,8 @@ export default function Donate() {
     const handleMonthlyAutoPaySubmit = async (e) => {
         if (e) e.preventDefault();
         const activeMonthlyAmt = isCustomMonthly ? Number(customMonthlyVal) : monthlyAmount;
-        if (!activeMonthlyAmt || activeMonthlyAmt < 500) {
-            return toast.error('Minimum monthly contribution is ₹500.');
+        if (!activeMonthlyAmt || activeMonthlyAmt < 10) {
+            return toast.error('Minimum monthly contribution is ₹10.');
         }
         if (!monthlyConsent) {
             return toast.error('Please accept and authorize the AutoPay recurring mandate.');
@@ -1134,7 +1134,7 @@ export default function Donate() {
                                         if (!email.trim() || !email.includes('@')) return toast.error('Please provide a valid email address.');
                                         if (!isCaptchaChecked) return toast.error('Please complete security check.');
                                         if (!isTermsAgreed) return toast.error('Please accept the terms and conditions.');
-                                        const amt = Math.max(500, effectiveAmount);
+                                        const amt = Math.max(10, effectiveAmount);
                                         setMonthlySubmitting(true);
                                         try {
                                             const payload = {
@@ -1305,7 +1305,7 @@ export default function Donate() {
                                 <div className="dp-field-group">
                                     <label className="dp-field-label">Select Monthly Amount (₹ / month) *</label>
                                     <div className="dp-amounts-grid monthly-grid">
-                                        {[500, 1000, 2500, 5000, 10000].map((amt) => {
+                                        {[10, 50, 100, 500, 1000, 2500, 5000].map((amt) => {
                                             const isSelected = !isCustomMonthly && monthlyAmount === amt;
                                             return (
                                                 <button
@@ -1337,21 +1337,21 @@ export default function Donate() {
                                                 <input
                                                     type="text"
                                                     inputMode="numeric"
-                                                    placeholder="Enter monthly amount (min ₹500)"
+                                                    placeholder="Enter monthly amount (min ₹10)"
                                                     value={customMonthlyVal}
                                                     onChange={(e) => {
                                                         const val = e.target.value.replace(/\D/g, '');
                                                         setCustomMonthlyVal(val);
                                                     }}
                                                     className="dp-custom-input"
-                                                    style={customMonthlyVal !== '' && Number(customMonthlyVal) < 500 ? { borderColor: '#dc2626' } : undefined}
+                                                    style={customMonthlyVal !== '' && Number(customMonthlyVal) < 10 ? { borderColor: '#dc2626' } : undefined}
                                                     autoFocus
                                                 />
                                                 <span className="dp-input-suffix">/ month</span>
                                             </div>
-                                            {customMonthlyVal !== '' && Number(customMonthlyVal) < 500 && (
+                                            {customMonthlyVal !== '' && Number(customMonthlyVal) < 10 && (
                                                 <div style={{ color: '#dc2626', fontSize: 12, fontWeight: 700, marginTop: 4 }}>
-                                                    ⚠️ Minimum monthly contribution is ₹500/mo
+                                                    ⚠️ Minimum monthly contribution is ₹10/mo
                                                 </div>
                                             )}
                                         </div>

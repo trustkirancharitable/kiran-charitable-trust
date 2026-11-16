@@ -1,0 +1,480 @@
+.payment-integration-hub {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    padding: 24px;
+    max-width: 620px;
+    margin: 0 auto;
+    font-family: inherit;
+}
+
+.payment-hub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.payment-hub-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.trust-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.trust-badges .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #ecfdf5;
+    color: #065f46;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid #a7f3d0;
+}
+
+/* Tab Navigation */
+.payment-method-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    background: #f8fafc;
+    padding: 6px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.method-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.method-nav-btn:hover {
+    background: #ffffff;
+    border-color: #e2e8f0;
+}
+
+.method-nav-btn.active {
+    background: #ffffff;
+    border-color: #0284c7;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+}
+
+.method-nav-btn .tab-icon {
+    font-size: 1.35rem;
+    color: #64748b;
+}
+
+.method-nav-btn.active .tab-icon {
+    color: #0284c7;
+}
+
+.method-nav-btn strong {
+    display: block;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.method-nav-btn small {
+    display: block;
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+/* Card Previews */
+.card-preview {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #ffffff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-preview.debit-theme {
+    background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);
+}
+
+.card-preview.debit-theme.rupay {
+    background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+}
+
+.card-preview.credit-theme {
+    background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);
+}
+
+.card-preview.credit-theme.amex {
+    background: linear-gradient(135deg, #0284c7 0%, #1e3a8a 100%);
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.card-chip {
+    width: 36px;
+    height: 26px;
+    background: #fbbf24;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 2px #d97706;
+}
+
+.card-brand-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.card-number-display {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.25rem;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.card-bottom {
+    display: flex;
+    justify-content: space-between;
+}
+
+.card-bottom small {
+    display: block;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2px;
+}
+
+.card-bottom p {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.form-group-grid,
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon input {
+    padding-right: 40px;
+}
+
+.input-icon {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+/* AutoPay elements */
+.mandate-type-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.mandate-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+
+.mandate-tab.active {
+    background: #e0f2fe;
+    border-color: #0284c7;
+    color: #0369a1;
+}
+
+.upi-app-selector {
+    margin-bottom: 16px;
+}
+
+.section-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.app-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.app-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #334155;
+}
+
+.app-chip.active {
+    border-color: #0284c7;
+    background: #f0f9ff;
+    color: #0284c7;
+}
+
+.app-chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.help-text {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 4px;
+    display: block;
+}
+
+/* RBI & Trust Disclosures */
+.rbi-disclosure-box,
+.rupay-banner {
+    display: flex;
+    gap: 12px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 12px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    color: #1e40af;
+}
+
+.rupay-banner {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.rbi-disclosure-box .shield-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    color: #2563eb;
+}
+
+.rbi-disclosure-box p {
+    margin: 4px 0 0 0;
+    color: #3b82f6;
+    line-height: 1.4;
+}
+
+.checkbox-consent,
+.checkbox-tokenization {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 18px;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: #475569;
+}
+
+.checkbox-consent input,
+.checkbox-tokenization input {
+    margin-top: 3px;
+    accent-color: #0284c7;
+}
+
+.token-text strong {
+    display: block;
+    color: #1e293b;
+}
+
+.token-text small {
+    display: block;
+    color: #64748b;
+}
+
+.debit-security-note,
+.international-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #64748b;
+    margin-bottom: 18px;
+}
+
+/* Buttons */
+.btn-submit-autopay,
+.btn-pay-card,
+.btn-pay-credit {
+    width: 100%;
+    padding: 14px;
+    background: #0284c7;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-submit-autopay:hover,
+.btn-pay-card:hover,
+.btn-pay-credit:hover {
+    background: #0369a1;
+}
+
+.btn-submit-autopay:disabled,
+.btn-pay-card:disabled,
+.btn-pay-credit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* AutoPay Success Card */
+.autopay-mandate-success-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.autopay-mandate-success-card .success-badge {
+    margin-bottom: 12px;
+}
+
+.mandate-summary-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+    margin: 16px 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.88rem;
+}
+
+.mandate-summary-box span {
+    color: #64748b;
+}
+
+.btn-open-upi-app {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #059669;
+    color: #ffffff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.rbi-security-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    color: #92400e;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 16px;
+    font-size: 0.78rem;
+    text-align: left;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
