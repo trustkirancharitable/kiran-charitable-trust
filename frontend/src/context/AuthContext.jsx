@@ -58,9 +58,11 @@ export function AuthProvider({ children }) {
     };
 
     // 1. Password Login
-    const loginWithPassword = async ({ email, password }) => {
+    const loginWithPassword = async (arg1, arg2) => {
         setIsLoading(true);
         try {
+            const email = (typeof arg1 === 'object' && arg1 !== null) ? arg1.email : arg1;
+            const password = (typeof arg1 === 'object' && arg1 !== null) ? arg1.password : arg2;
             const res = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
             if (res.data?.success && res.data.token) {
                 setToken(res.data.token);
@@ -122,9 +124,17 @@ export function AuthProvider({ children }) {
     };
 
     // 4. Reset Password with OTP
-    const resetPassword = async ({ email, otp, newPassword }) => {
+    const resetPassword = async (arg1, arg2, arg3) => {
         setIsLoading(true);
         try {
+            let email, otp, newPassword;
+            if (typeof arg1 === 'object' && arg1 !== null) {
+                ({ email, otp, newPassword } = arg1);
+            } else {
+                email = arg1;
+                otp = arg2;
+                newPassword = arg3;
+            }
             const res = await axios.post(`${API_BASE_URL}/auth/reset-password`, {
                 email,
                 otp,
@@ -161,9 +171,16 @@ export function AuthProvider({ children }) {
     };
 
     // 6. Verify Email OTP
-    const verifyOtp = async ({ email, otp, name, phone, role, type }) => {
+    const verifyOtp = async (arg1, arg2) => {
         setIsLoading(true);
         try {
+            let email, otp, name, phone, role, type;
+            if (typeof arg1 === 'object' && arg1 !== null) {
+                ({ email, otp, name, phone, role, type } = arg1);
+            } else {
+                email = arg1;
+                otp = arg2;
+            }
             const otpToken = sessionStorage.getItem('kct_otp_token') || '';
             const res = await axios.post(`${API_BASE_URL}/auth/verify-otp`, {
                 email,

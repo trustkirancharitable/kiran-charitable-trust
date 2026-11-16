@@ -122,6 +122,7 @@ function App() {
                 <Route path="/signin" element={<Navigate to="/login" replace />} />
                 <Route path="/register" element={<Navigate to="/login?tab=register" replace />} />
                 <Route path="/join" element={<Navigate to="/login?tab=register" replace />} />
+                <Route path="/forgot-password" element={<PortalForgotPassword />} />
 
                 {/* User Dashboard & Profile redirects into Member Portal */}
                 <Route path="/dashboard" element={<Navigate to="/portal/profile" replace />} />

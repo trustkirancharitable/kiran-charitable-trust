@@ -31,6 +31,8 @@ export default function MainLogin() {
         sendOtp,
         verifyOtp,
         loginWithGoogle,
+        forgotPassword,
+        resetPassword,
         user,
         isAuthenticated
     } = useAuth();
@@ -42,7 +44,7 @@ export default function MainLogin() {
     // ─────────────────────────────────────────────────────────────
     // LOGIN STATE
     // ─────────────────────────────────────────────────────────────
-    const [loginMethod, setLoginMethod] = useState('otp'); // 'otp' | 'password'
+    const [loginMethod, setLoginMethod] = useState('otp'); // 'otp' | 'password' | 'forgot'
     const [otpStep, setOtpStep] = useState('input'); // 'input' | 'verify'
     const [loginEmail, setLoginEmail] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
@@ -52,6 +54,14 @@ export default function MainLogin() {
     const [devOtpHint, setDevOtpHint] = useState('');
     const [portalLaunched, setPortalLaunched] = useState(false);
     const otpInputRefs = useRef([]);
+
+    // Forgot Password State
+    const [forgotStep, setForgotStep] = useState('request'); // 'request' | 'reset'
+    const [forgotEmail, setForgotEmail] = useState('');
+    const [forgotOtp, setForgotOtp] = useState('');
+    const [forgotNewPassword, setForgotNewPassword] = useState('');
+    const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+    const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
 
     // ─────────────────────────────────────────────────────────────
     // REGISTER STATE (Exact 4-Step Portal Join Logic)
@@ -194,7 +204,7 @@ export default function MainLogin() {
 
         try {
             setLoadingLocal(true);
-            const res = await loginWithPassword(loginEmail.trim(), loginPassword);
+            const res = await loginWithPassword({ email: loginEmail.trim(), password: loginPassword });
             if (res.success) {
                 setSuccessMessage('Login successful! Opening your member portal in a new tab...');
                 setPortalLaunched(true);
@@ -258,7 +268,7 @@ export default function MainLogin() {
 
         try {
             setLoadingLocal(true);
-            const res = await verifyOtp(loginEmail.trim(), code);
+            const res = await verifyOtp({ email: loginEmail.trim(), otp: code });
             if (res.success) {
                 setSuccessMessage('Passcode verified! Opening your member portal in a new tab...');
                 setPortalLaunched(true);
@@ -269,6 +279,84 @@ export default function MainLogin() {
             }
         } catch (err) {
             setErrorMessage(err.message || 'Passcode verification failed.');
+        } finally {
+            setLoadingLocal(false);
+        }
+    };
+
+    // ─────────────────────────────────────────────────────────────
+    // FORGOT / RESET PASSWORD HANDLERS
+    // ─────────────────────────────────────────────────────────────
+    const handleForgotRequestOtp = async (e) => {
+        if (e) e.preventDefault();
+        const targetEmail = (forgotEmail || loginEmail || '').trim();
+        if (!targetEmail || !targetEmail.includes('@')) {
+            setErrorMessage('Please enter a valid registered email address.');
+            return;
+        }
+        if (!isCaptchaChecked) {
+            setErrorMessage('Please complete security verification by checking "I\'m not a robot".');
+            return;
+        }
+        setErrorMessage('');
+        setSuccessMessage('');
+        setLoadingLocal(true);
+        try {
+            const res = await forgotPassword(targetEmail);
+            if (res.success) {
+                setForgotStep('reset');
+                setSuccessMessage(`Password recovery passcode dispatched to ${targetEmail}.`);
+                if (res.devOtp || res.otp) setDevOtpHint(res.devOtp || res.otp);
+                toast.info(`Recovery passcode sent to ${targetEmail}`);
+            } else {
+                setErrorMessage(res.message || 'Failed to dispatch password recovery code.');
+            }
+        } catch (err) {
+            setErrorMessage(err.message || 'Error requesting password reset.');
+        } finally {
+            setLoadingLocal(false);
+        }
+    };
+
+    const handleForgotResetPassword = async (e) => {
+        if (e) e.preventDefault();
+        const targetEmail = (forgotEmail || loginEmail || '').trim();
+        if (!forgotOtp || forgotOtp.trim().length !== 6) {
+            setErrorMessage('Please enter the 6-digit verification code.');
+            return;
+        }
+        if (!forgotNewPassword || forgotNewPassword.length < 6) {
+            setErrorMessage('New password must be at least 6 characters long.');
+            return;
+        }
+        if (forgotNewPassword !== forgotConfirmPassword) {
+            setErrorMessage('New passwords do not match. Please verify.');
+            return;
+        }
+        setErrorMessage('');
+        setSuccessMessage('');
+        setLoadingLocal(true);
+        try {
+            const res = await resetPassword({
+                email: targetEmail,
+                otp: forgotOtp.trim(),
+                newPassword: forgotNewPassword
+            });
+            if (res.success) {
+                setSuccessMessage('Password reset successfully! You can now sign in with your new password.');
+                toast.success('Password updated successfully!');
+                setLoginPassword(forgotNewPassword);
+                setLoginEmail(targetEmail);
+                setLoginMethod('password');
+                setForgotStep('request');
+                setForgotOtp('');
+                setForgotNewPassword('');
+                setForgotConfirmPassword('');
+            } else {
+                setErrorMessage(res.message || 'Failed to reset password. Please check your verification code.');
+            }
+        } catch (err) {
+            setErrorMessage(err.message || 'Error resetting password.');
         } finally {
             setLoadingLocal(false);
         }
@@ -553,7 +641,157 @@ export default function MainLogin() {
                                     </button>
                                 </div>
 
-                                {loginMethod === 'password' ? (
+                                {loginMethod === 'forgot' ? (
+                                    <div className="forgot-password-panel" style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.65rem' }}>
+                                            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0F172A' }}>
+                                                {forgotStep === 'request' ? '🔑 Password Recovery' : '🔒 Set New Password'}
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setLoginMethod('password'); setForgotStep('request'); setErrorMessage(''); setSuccessMessage(''); }}
+                                                style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', padding: 0 }}
+                                            >
+                                                ← Back to Sign In
+                                            </button>
+                                        </div>
+
+                                        {forgotStep === 'request' ? (
+                                            <form onSubmit={handleForgotRequestOtp}>
+                                                <div className="field-group">
+                                                    <label className="field-label">
+                                                        <FaEnvelope style={{ color: '#0F52BA' }} /> Registered Email Address *
+                                                    </label>
+                                                    <input
+                                                        type="email"
+                                                        className="main-input"
+                                                        placeholder="Enter your registered email"
+                                                        value={forgotEmail || loginEmail}
+                                                        onChange={e => { setForgotEmail(e.target.value); setLoginEmail(e.target.value); }}
+                                                        required
+                                                    />
+                                                    <span className="field-hint" style={{ fontSize: '0.78rem', color: '#64748b', display: 'block', marginTop: 4 }}>
+                                                        A 6-digit recovery passcode will be dispatched to your email address.
+                                                    </span>
+                                                </div>
+
+                                                {/* Interactive reCAPTCHA */}
+                                                <div
+                                                    className={`dp-recaptcha-box ${isCaptchaChecked ? 'verified' : ''} ${isCaptchaSpinning ? 'spinning' : ''}`}
+                                                    onClick={handleCaptchaClick}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                >
+                                                    <div className="dp-recaptcha-left">
+                                                        <div className="dp-recaptcha-checkbox-wrapper">
+                                                            {isCaptchaSpinning ? (
+                                                                <div className="dp-recaptcha-spinner" />
+                                                            ) : isCaptchaChecked ? (
+                                                                <svg className="dp-recaptcha-checkmark" viewBox="0 0 24 24" width="28" height="28">
+                                                                    <path fill="#0f9d58" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                                                                </svg>
+                                                            ) : (
+                                                                <div className="dp-recaptcha-square" />
+                                                            )}
+                                                        </div>
+                                                        <span className="dp-recaptcha-text">I'm not a robot</span>
+                                                    </div>
+                                                    <div className="dp-recaptcha-right">
+                                                        <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" className="dp-recaptcha-logo" />
+                                                        <span className="dp-recaptcha-brand-title">reCAPTCHA</span>
+                                                    </div>
+                                                </div>
+
+                                                <button type="submit" className="btn-main-submit" disabled={loadingLocal} style={{ marginTop: '1rem' }}>
+                                                    {loadingLocal ? 'Dispatching Passcode...' : 'Send Recovery Code →'}
+                                                </button>
+                                            </form>
+                                        ) : (
+                                            <form onSubmit={handleForgotResetPassword}>
+                                                <div className="field-group">
+                                                    <label className="field-label">
+                                                        <FaEnvelope style={{ color: '#0F52BA' }} /> Account Email
+                                                    </label>
+                                                    <input
+                                                        type="email"
+                                                        className="main-input"
+                                                        value={forgotEmail || loginEmail}
+                                                        disabled
+                                                        style={{ background: '#f1f5f9', color: '#475569' }}
+                                                    />
+                                                </div>
+
+                                                <div className="field-group">
+                                                    <label className="field-label">
+                                                        <FaLock style={{ color: '#0F52BA' }} /> 6-Digit Verification Code *
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        inputMode="numeric"
+                                                        maxLength={6}
+                                                        className="main-input"
+                                                        placeholder="Enter 6-digit code"
+                                                        value={forgotOtp}
+                                                        onChange={e => setForgotOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <div className="field-group">
+                                                    <label className="field-label">
+                                                        <FaLock style={{ color: '#0F52BA' }} /> New Password * (Min 6 Characters)
+                                                    </label>
+                                                    <div className="password-input-wrap">
+                                                        <input
+                                                            type={showForgotNewPassword ? 'text' : 'password'}
+                                                            className="main-input"
+                                                            placeholder="Enter new password"
+                                                            value={forgotNewPassword}
+                                                            onChange={e => setForgotNewPassword(e.target.value)}
+                                                            required
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            className="btn-toggle-eye"
+                                                            onClick={() => setShowForgotNewPassword(!showForgotNewPassword)}
+                                                            aria-label="Toggle password visibility"
+                                                        >
+                                                            {showForgotNewPassword ? <FaEyeSlash /> : <FaEye />}
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="field-group">
+                                                    <label className="field-label">
+                                                        <FaLock style={{ color: '#0F52BA' }} /> Confirm New Password *
+                                                    </label>
+                                                    <input
+                                                        type={showForgotNewPassword ? 'text' : 'password'}
+                                                        className="main-input"
+                                                        placeholder="Confirm new password"
+                                                        value={forgotConfirmPassword}
+                                                        onChange={e => setForgotConfirmPassword(e.target.value)}
+                                                        required
+                                                    />
+                                                </div>
+
+                                                <button type="submit" className="btn-main-submit" disabled={loadingLocal} style={{ marginTop: '1rem' }}>
+                                                    {loadingLocal ? 'Updating Password...' : 'Reset Password & Sign In →'}
+                                                </button>
+
+                                                <div style={{ marginTop: '0.85rem', textAlign: 'center' }}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setForgotStep('request')}
+                                                        style={{ background: 'none', border: 'none', color: '#0F52BA', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer' }}
+                                                    >
+                                                        Didn't receive passcode? Request again
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        )}
+                                    </div>
+                                ) : loginMethod === 'password' ? (
                                     <form onSubmit={handleLoginPasswordSubmit}>
                                         <div className="field-group">
                                             <label className="field-label">
@@ -570,9 +808,32 @@ export default function MainLogin() {
                                         </div>
 
                                         <div className="field-group">
-                                            <label className="field-label">
-                                                <FaLock style={{ color: '#0F52BA' }} /> Password *
-                                            </label>
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                                                <label className="field-label" style={{ margin: 0 }}>
+                                                    <FaLock style={{ color: '#0F52BA' }} /> Password *
+                                                </label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setForgotEmail(loginEmail);
+                                                        setLoginMethod('forgot');
+                                                        setForgotStep('request');
+                                                        setErrorMessage('');
+                                                        setSuccessMessage('');
+                                                    }}
+                                                    style={{
+                                                        background: 'none',
+                                                        border: 'none',
+                                                        color: '#0F52BA',
+                                                        fontSize: '0.82rem',
+                                                        fontWeight: 700,
+                                                        cursor: 'pointer',
+                                                        padding: 0
+                                                    }}
+                                                >
+                                                    Forgot Password?
+                                                </button>
+                                            </div>
                                             <div className="password-input-wrap">
                                                 <input
                                                     type={showPassword ? 'text' : 'password'}

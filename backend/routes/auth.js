@@ -109,12 +109,13 @@ async function isEmailRegistered(email) {
     // 2. Check MongoDB models
     if (mongoose.connection.readyState >= 1) {
         try {
-            const [u, tm, v] = await Promise.all([
+            const [u, tm, v, d] = await Promise.all([
                 User.findOne({ email: normalized }),
                 TrustMember.findOne({ email: normalized }),
-                Volunteer.findOne({ email: normalized })
+                Volunteer.findOne({ email: normalized }),
+                Donation.findOne({ email: normalized })
             ]);
-            if (u || tm || v) return true;
+            if (u || tm || v || d) return true;
         } catch (e) {}
     }
 
@@ -776,12 +777,13 @@ router.post('/forgot-password', async (req, res) => {
         }
         const normalizedEmail = email.toLowerCase().trim();
 
-        // Check if admin or regular user exists
+        // Check if admin, regular user, or member exists
         const isAdm = isAdminEmail(normalizedEmail);
         const user = await findUser(normalizedEmail);
         const member = await findTrustMember(normalizedEmail);
+        const isRegistered = isAdm || !!user || !!member || (await isEmailRegistered(normalizedEmail));
 
-        if (!isAdm && !user && !member) {
+        if (!isRegistered) {
             return res.status(404).json({
                 success: false,
                 message: 'No registered account found with this email address.'
